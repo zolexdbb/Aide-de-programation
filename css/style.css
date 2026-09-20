@@ -1,3 +1,6 @@
+/* Palette "claire" par défaut : couleurs neutres de l'interface (bg, surface,
+   texte, bordures) puis une couleur d'identité par langage, réutilisée pour
+   les onglets, les bandes de couleur des fiches et les boutons de l'accueil. */
 :root {
     --bg: #f6f5f2;
     --surface: #ffffff;
@@ -11,7 +14,7 @@
     --code-text: #e9e9e6;
     --code-dim: #8b8d94;
     --shadow: 0 1px 2px rgba(20,20,20,.04), 0 8px 24px rgba(20,20,20,.05);
-    --radius: 10px;
+    --radius: 12px;
 
     --accueil-color: #3457d5;
     --c-color: #3457d5;
@@ -25,6 +28,8 @@
     --git-color: #b0431e;
   }
 
+  /* Mode sombre automatique (suit les préférences du système), sauf si l'utilisateur
+     a explicitement choisi le thème clair via data-theme="light" sur <html>. */
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #131417;
@@ -52,6 +57,8 @@
       --git-color: #f08a63;
     }
   }
+  /* Mode sombre forcé (même palette que ci-dessus), pour un futur bouton de
+     bascule manuelle qui poserait data-theme="dark" sur <html>. */
   :root[data-theme="dark"] {
     --bg: #131417;
     --surface: #1b1c20;
@@ -81,45 +88,64 @@
   * { box-sizing: border-box; }
 
   body {
-    background: var(--bg);
+    background-color: var(--bg);
+    /* Halo dégradé multicolore, fixé au viewport (pas au contenu) : il reste
+       visible en haut de l'écran quoi qu'on fasse défiler en dessous. */
+    background-image:
+      radial-gradient(ellipse 45vw 40vh at 18% 0%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse 45vw 40vh at 82% 8%, color-mix(in srgb, var(--web-color) 18%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse 50vw 35vh at 50% 28%, color-mix(in srgb, var(--html-color) 12%, transparent) 0%, transparent 70%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--text);
     font-family: 'Manrope', system-ui, -apple-system, "Segoe UI", sans-serif;
     padding-inline: 0;
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Conteneur centré de toute la page ; sa largeur borne aussi la largeur
+     des grilles de fiches (.cards, .intro-grid) puisqu'elles héritent de lui. */
   .page {
-    max-width: 1080px;
+    max-width: 1240px;
     margin: 0 auto;
-    padding-inline: 20px;
-    padding-block: 28px 64px;
+    padding-inline: 24px;
+    padding-block: 32px 72px;
   }
 
+  /* En-tête : titre, accroche et compteur, centrés comme une vraie page d'accueil. */
   header.hero {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 22px;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding-block: 40px 34px;
+    margin-bottom: 8px;
   }
   header.hero .eyebrow {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 12px;
+    font-size: 11.5px;
     letter-spacing: .08em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 6px 16px;
   }
   header.hero h1 {
     font-family: 'Sora', system-ui, sans-serif;
     font-weight: 700;
-    font-size: clamp(24px, 4vw, 32px);
+    font-size: clamp(28px, 5vw, 42px);
     margin: 0;
     text-wrap: balance;
   }
   header.hero p {
     color: var(--text-dim);
     margin: 0;
-    font-size: 14.5px;
-    max-width: 68ch;
+    margin-inline: auto;
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 62ch;
   }
   header.hero p code {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -134,14 +160,19 @@
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 11.5px;
     color: var(--text-dim);
-    margin-top: 4px;
+    margin-top: 2px;
   }
 
+  /* Barre collante (recherche + onglets) : reste visible en haut au scroll.
+     Fond semi-transparent + flou plutôt qu'une couleur pleine, pour laisser
+     deviner le dégradé du body derrière au lieu d'une bande unie tranchée. */
   .controls {
     position: sticky;
     top: env(safe-area-inset-top, 0px);
     z-index: 5;
-    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     padding-block: 12px 10px;
     display: flex;
     flex-direction: column;
@@ -153,20 +184,22 @@
   .search-row {
     position: relative;
     display: flex;
-    gap: 8px;
+    justify-content: center;
+    gap: 10px;
     align-items: center;
   }
-  .search-row .field { position: relative; flex: 1; }
+  .search-row .field { position: relative; flex: 0 1 560px; }
   .search-row input {
     width: 100%;
     font: inherit;
-    font-size: 14.5px;
-    padding: 10px 14px 10px 36px;
-    border-radius: var(--radius);
+    font-size: 15px;
+    padding: 12px 18px 12px 40px;
+    border-radius: 999px;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
     outline: none;
+    box-shadow: var(--shadow);
   }
   .search-row input:focus {
     border-color: var(--accent);
@@ -174,7 +207,7 @@
   }
   .search-row svg {
     position: absolute;
-    left: 12px;
+    left: 16px;
     top: 50%;
     translate: 0 -50%;
     color: var(--text-dim);
@@ -188,8 +221,12 @@
     flex: none;
   }
 
+  /* Onglets principaux. --tab-color est posée en JS (voir buildTabs) sur
+     chaque bouton, avec la couleur du langage correspondant. */
   .tabs {
     display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 2px;
@@ -228,13 +265,13 @@
   }
   .tab[aria-selected="true"] .dot { background: #fff; }
 
+  /* Sous-onglets (HTML / CSS / JavaScript sous "Site Web"). Générés/masqués
+     dynamiquement par buildSubtabs() selon l'onglet principal actif. */
   .subtabs {
     display: flex;
+    justify-content: center;
     gap: 6px;
     flex-wrap: wrap;
-    padding-left: 6px;
-    border-left: 2px solid var(--border);
-    margin-left: 2px;
   }
   .subtabs[hidden] { display: none; }
 
@@ -258,6 +295,8 @@
     color: #fff;
   }
 
+  /* Zone principale où render()/renderLang()/renderAccueil() injectent le
+     contenu : un .section-group par thème (ou par langage en recherche globale). */
   .panels { display: flex; flex-direction: column; gap: 30px; }
 
   .section-group {
@@ -265,6 +304,8 @@
     flex-direction: column;
     gap: 12px;
   }
+  /* --group-color est posée en JS (renderLang/renderGlobalSearch) sur le
+     .section-group parent : titre et soulignement reprennent la couleur du langage. */
   .section-group h2 {
     font-family: 'Sora', system-ui, sans-serif;
     font-size: 12px;
@@ -273,7 +314,7 @@
     color: var(--group-color, var(--text-dim));
     margin: 0;
     padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--group-color, var(--border));
   }
 
   .cards {
@@ -283,15 +324,40 @@
     align-items: start;
   }
 
-  .intro-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-    gap: 14px;
+  /* Titre + accroche centrés au-dessus de la grille de langages, sur l'accueil. */
+  .accueil-lead {
+    text-align: center;
+    max-width: 60ch;
+    margin: 4px auto 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .accueil-lead h2 {
+    font-family: 'Sora', system-ui, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+  }
+  .accueil-lead p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
   }
 
+  .intro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  /* Carte de présentation d'un langage, sur l'accueil. --card-color est posée
+     en JS (makeIntroCard) depuis le champ "color" de accueil.js. */
   .intro-card {
     background: var(--surface);
     border: 1px solid var(--border);
+    border-top: 3px solid var(--card-color, var(--accent));
     border-radius: 16px;
     box-shadow: var(--shadow);
     padding: 20px;
@@ -302,12 +368,20 @@
   }
   .intro-card:hover {
     transform: translateY(-3px);
-    border-color: var(--accent);
+    border-color: var(--card-color, var(--accent));
     box-shadow: 0 2px 4px rgba(20,20,20,.06), 0 14px 28px rgba(20,20,20,.09);
   }
   .intro-emoji {
-    font-size: 30px;
+    font-size: 24px;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    background: color-mix(in srgb, var(--card-color, var(--accent)) 16%, var(--surface-2));
   }
   .intro-card h3 {
     margin: 0;
@@ -319,7 +393,7 @@
     margin: -4px 0 0;
     font-size: 12.5px;
     font-weight: 600;
-    color: var(--accent);
+    color: var(--card-color, var(--accent));
     font-style: italic;
   }
   .intro-text {
@@ -347,7 +421,7 @@
     font-size: 13px;
     font-weight: 600;
     color: #fff;
-    background: var(--accent);
+    background: var(--card-color, var(--accent));
     border: none;
     border-radius: 999px;
     padding: 8px 16px;
@@ -355,16 +429,25 @@
     transition: filter .15s, transform .15s;
   }
   .intro-btn:hover { filter: brightness(1.1); transform: translateX(1px); }
-  .intro-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .intro-btn:focus-visible { outline: 2px solid var(--card-color, var(--accent)); outline-offset: 2px; }
 
+  /* Fiche de code (titre, description, extrait). --group-color vient du
+     .section-group ancêtre : chaque fiche hérite la couleur de sa section. */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
+    border-top: 3px solid var(--group-color, var(--border));
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--group-color, var(--accent));
+    box-shadow: 0 2px 4px rgba(20,20,20,.06), 0 14px 28px rgba(20,20,20,.09);
   }
   .card-head {
     padding: 11px 14px 8px;
@@ -385,6 +468,8 @@
     line-height: 1.5;
   }
 
+  /* Bloc de code : toujours sombre (même en thème clair), comme un terminal,
+     pour un bon contraste et une lecture identique dans les deux thèmes. */
   .code-wrap {
     position: relative;
     background: var(--code-bg);
@@ -392,6 +477,8 @@
   .code-wrap pre {
     margin: 0;
     padding: 12px 14px;
+    /* pre-wrap + overflow-wrap : le code retourne à la ligne au lieu de
+       nécessiter un défilement horizontal pour lire la fin d'une ligne. */
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
@@ -401,6 +488,7 @@
     tab-size: 2;
   }
 
+  /* Bouton "Copier", superposé en haut à droite du bloc de code (voir makeCard). */
   .copy-btn {
     position: absolute;
     top: 6px;
@@ -420,6 +508,8 @@
   .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .copy-btn[data-copied="true"] { color: #7be0a0; border-color: #7be0a0; }
 
+  /* Message affiché quand une recherche ne trouve aucune fiche (voir .visible
+     posée par render()/renderLang()/renderGlobalSearch() côté JS). */
   .empty-state {
     text-align: center;
     color: var(--text-dim);
@@ -429,6 +519,7 @@
   }
   .empty-state.visible { display: block; }
 
+  /* Renforce l'attribut HTML natif "hidden" (utilisé pour masquer .subtabs). */
   [hidden] { display: none !important; }
 
   @media (max-width: 520px) {
@@ -436,6 +527,8 @@
     .count-badge { display: none; }
   }
 
+  /* Respecte les préférences d'accessibilité : coupe toutes les transitions
+     (hover, apparition, etc.) pour qui a demandé de réduire les animations. */
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
   }

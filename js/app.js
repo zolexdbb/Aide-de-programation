@@ -17,6 +17,10 @@ const NAV_RAW = [
   { id: 'git' }
 ];
 
+// Ne garde que les entrées dont les données ont bien été chargées (au cas où
+// un fichier js/data/*.js manquerait ou échouerait à charger) : un onglet
+// groupé disparaît si aucun de ses enfants n'a de données, un onglet simple
+// disparaît s'il n'a pas de données du tout.
 const NAV = NAV_RAW.filter(entry => {
   if (entry.children) {
     entry.children = entry.children.filter(id => !!D[id]);
@@ -25,6 +29,7 @@ const NAV = NAV_RAW.filter(entry => {
   return !!D[entry.id];
 });
 
+// Références vers les éléments du DOM manipulés par le reste du fichier.
 const tabsEl = document.getElementById('tabs');
 const subtabsEl = document.getElementById('subtabs');
 const panelsEl = document.getElementById('panels');
@@ -34,9 +39,14 @@ const emptyEl = document.getElementById('empty');
 const countBadgeEl = document.getElementById('count-badge');
 const totalCountEl = document.getElementById('total-count');
 
+// État courant de la navigation : l'onglet principal affiché (ou 'accueil'),
+// et le sous-onglet affiché quand l'onglet principal a des enfants (ex : "web").
 let active = NAV.length ? NAV[0].id : null;
 let activeSub = null;
 
+// Échappe les caractères spéciaux HTML avant de les insérer via innerHTML,
+// pour que le contenu des fiches (issu des fichiers de données) ne casse jamais
+// le HTML et ne puisse pas injecter de balises.
 function escapeHtml(str) {
   return str.replace(/[&<>"']/g, ch => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -68,10 +78,14 @@ function matchesAllTokens(text, tokens) {
   return tokens.every(t => text.includes(t));
 }
 
+// Retrouve une entrée de NAV (onglet principal) à partir de son id.
 function navEntry(id) {
   return NAV.find(e => e.id === id);
 }
 
+// Liste les langages "feuilles" (ceux qui ont réellement des fiches à afficher),
+// en dépliant les onglets groupés comme "web" en leurs enfants (html, css, js).
+// Sert pour le total de fiches et pour la recherche globale.
 function leafLangs() {
   const result = [];
   NAV.forEach(entry => {
@@ -82,6 +96,7 @@ function leafLangs() {
   return result;
 }
 
+// Nombre total de fiches, toutes langues confondues (affiché sous le titre).
 function totalCards() {
   return leafLangs().reduce((sum, lang) => sum + lang.groups.reduce((s, g) => s + g.cards.length, 0), 0);
 }
@@ -97,6 +112,8 @@ function goTo(id) {
   document.querySelector('.controls').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// Construit une fois pour toutes les boutons de la barre d'onglets principale
+// (Accueil, C, C++, ..., Site Web, ...) et branche leur clic.
 function buildTabs() {
   NAV.forEach(entry => {
     const data = D[entry.id];
@@ -109,6 +126,7 @@ function buildTabs() {
     btn.style.setProperty('--tab-color', color);
     btn.dataset.id = entry.id;
     btn.innerHTML = `<span class="dot"></span>${escapeHtml(label)}`;
+    // Info-bulle : nombre de fiches (et langages regroupés, pour "Site Web").
     if (entry.children) {
       const nb = entry.children.reduce((s, id) => s + D[id].groups.reduce((s2, g) => s2 + g.cards.length, 0), 0);
       btn.title = entry.children.map(id => D[id].label).join(' / ') + ' — ' + nb + ' fiches';
@@ -118,6 +136,8 @@ function buildTabs() {
     }
     btn.addEventListener('click', () => {
       active = entry.id;
+      // En entrant dans un onglet groupé, on garde le sous-onglet déjà choisi
+      // s'il appartient à ce groupe, sinon on retombe sur le premier enfant.
       activeSub = entry.children ? (entry.children.includes(activeSub) ? activeSub : entry.children[0]) : null;
       render();
     });
@@ -127,6 +147,8 @@ function buildTabs() {
   totalCountEl.textContent = totalCards() + ' fiches au total, réparties sur ' + langs.length + ' langages';
 }
 
+// Construit les sous-onglets (HTML / CSS / JavaScript) d'un onglet groupé,
+// en reconstruisant entièrement la barre à chaque appel (elle est petite).
 function buildSubtabs(entry) {
   subtabsEl.innerHTML = '';
   subtabsEl.hidden = false;
@@ -146,9 +168,12 @@ function buildSubtabs(entry) {
   });
 }
 
+// Construit une fiche de code (titre, description, extrait, bouton copier).
 function makeCard(card) {
   const div = document.createElement('div');
   div.className = 'card';
+  // dataset.search n'est pas utilisé par la recherche actuelle (qui relit t/d/code
+  // directement), mais reste dispo pour une future recherche côté CSS/attribut.
   div.dataset.search = (card.t + ' ' + card.d + ' ' + card.code).toLowerCase();
   div.innerHTML = `
     <div class="card-head">
@@ -163,8 +188,11 @@ function makeCard(card) {
   const btn = div.querySelector('.copy-btn');
   btn.addEventListener('click', async () => {
     try {
+      // Chemin moderne : l'API Clipboard (nécessite un contexte sécurisé/HTTPS).
       await navigator.clipboard.writeText(card.code);
     } catch (e) {
+      // Repli pour file:// ou navigateurs sans API Clipboard : on sélectionne
+      // le texte dans un <textarea> invisible et on utilise execCommand.
       const ta = document.createElement('textarea');
       ta.value = card.code;
       ta.style.position = 'fixed';
@@ -174,6 +202,7 @@ function makeCard(card) {
       try { document.execCommand('copy'); } catch (e2) {}
       document.body.removeChild(ta);
     }
+    // Retour visuel temporaire sur le bouton ("Copié !") avant de revenir à l'état normal.
     const original = btn.textContent;
     btn.textContent = 'Copié !';
     btn.dataset.copied = 'true';
@@ -182,9 +211,14 @@ function makeCard(card) {
   return div;
 }
 
+// Construit une carte de présentation de langage pour la page d'accueil
+// (emoji, accroche, texte, bouton "En savoir plus" qui renvoie vers les fiches).
 function makeIntroCard(intro) {
   const div = document.createElement('div');
   div.className = 'intro-card';
+  // --card-color : couleur du langage (voir accueil.js), reprise par le CSS
+  // pour teinter la bande du haut, l'icône, le sous-titre et le bouton.
+  if (intro.color) div.style.setProperty('--card-color', intro.color);
   div.dataset.search = (intro.label + ' ' + intro.tag + ' ' + intro.text).toLowerCase();
   div.innerHTML = `
     <div class="intro-emoji" aria-hidden="true">${intro.emoji}</div>
@@ -205,6 +239,14 @@ function renderAccueil() {
   subtabsEl.hidden = true;
   panelsEl.innerHTML = '';
 
+  const lead = document.createElement('div');
+  lead.className = 'accueil-lead';
+  lead.innerHTML = `
+    <h2>Choisis un langage pour commencer</h2>
+    <p>Chaque carte mène vers ses fiches : syntaxe expliquée simplement, pièges classiques et exemples à copier-coller.</p>
+  `;
+  panelsEl.appendChild(lead);
+
   const groupEl = document.createElement('div');
   groupEl.className = 'section-group';
   const grid = document.createElement('div');
@@ -217,6 +259,10 @@ function renderAccueil() {
   emptyEl.classList.remove('visible');
 }
 
+// Affiche les fiches d'UN SEUL langage (celui de l'onglet/sous-onglet actif),
+// groupées par thème, en filtrant par la recherche si elle est non vide.
+// N'est appelée que quand la recherche est vide ou ne contient que des mots
+// vides (render() bascule sinon vers renderGlobalSearch).
 function renderLang(lang) {
   searchRowEl.hidden = false;
   panelsEl.innerHTML = '';
@@ -292,6 +338,9 @@ function renderGlobalSearch(tokens) {
   emptyEl.classList.toggle('visible', shown === 0);
 }
 
+// Point d'entrée du rendu : rappelé à chaque frappe dans la recherche et à
+// chaque changement d'onglet. Décide quelle vue afficher, dans cet ordre de
+// priorité : recherche globale > accueil > langage (avec ses sous-onglets).
 function render() {
   [...tabsEl.children].forEach((btn, i) => {
     btn.setAttribute('aria-selected', NAV[i].id === active ? 'true' : 'false');
@@ -300,6 +349,8 @@ function render() {
   const query = searchEl.value.trim();
   const tokens = query ? searchTokens(query) : [];
 
+  // Une recherche non vide prend toujours le dessus, même sur l'accueil :
+  // elle porte sur tous les langages, pas seulement sur l'onglet affiché.
   if (tokens.length) {
     renderGlobalSearch(tokens);
     return;
@@ -312,6 +363,8 @@ function render() {
 
   const entry = navEntry(active);
   if (entry.children) {
+    // Onglet groupé (Site Web) : on affiche ses sous-onglets, puis le langage
+    // actuellement sélectionné parmi eux (par défaut, le premier).
     if (!activeSub || !entry.children.includes(activeSub)) activeSub = entry.children[0];
     buildSubtabs(entry);
     renderLang(D[activeSub]);
@@ -321,6 +374,8 @@ function render() {
   }
 }
 
+// Recherche "live" : un rendu complet à chaque caractère tapé, sans debounce
+// (le site est petit, ça reste instantané).
 searchEl.addEventListener('input', render);
 
 buildTabs();

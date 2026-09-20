@@ -1,3 +1,10 @@
+<!--
+  Page unique du site : toute la navigation (onglets, sous-onglets, recherche,
+  affichage des fiches) est gérée en JavaScript par js/app.js, à partir des
+  données chargées depuis js/data/*.js. Ce fichier ne fait que poser le
+  squelette (header, barre de contrôle, conteneur des fiches) : voir plus bas
+  les commentaires sur chaque bloc pour savoir quel script le remplit.
+-->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,35 +12,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Le Codage pour les Nuls</title>
   <meta name="description" content="Le pense-bête qu'on garde ouvert dans un coin : C, C++, Arduino, HTML, CSS, JavaScript, Python et Git expliqués simplement, pour les débutants comme pour les experts qui ont un trou de mémoire.">
+  <!-- Polices Google Fonts : Sora (titres), Manrope (texte courant), JetBrains Mono (code) -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="page">
+    <!-- En-tête statique : texte fixe, identique sur tous les onglets. -->
     <header class="hero">
       <div class="eyebrow">Référence rapide, zéro jugement</div>
       <h1>Le Codage pour les Nuls</h1>
       <p>Non, ce n'est pas parce qu'on code depuis 15 ans qu'on se souvient de la syntaxe exacte d'un <code>printf</code> un lundi matin. Même les développeur(euses) les plus aguerri(es) gardent un pense-bête comme celui-ci sous le coude — alors les débutants ont toutes les raisons du monde d'en profiter aussi. Direction l'onglet <strong>Accueil</strong> pour découvrir chaque langage, ou foncez droit dans les fiches. Cliquez sur un extrait pour le copier.</p>
+      <!-- Rempli par buildTabs() dans js/app.js ("X fiches au total, réparties sur Y langages") -->
       <div class="meta" id="total-count"></div>
     </header>
 
+    <!-- Barre collante : recherche + onglets. Les boutons d'onglets et de
+         sous-onglets sont générés dynamiquement par buildTabs()/buildSubtabs()
+         dans js/app.js — il n'y a rien à modifier ici pour ajouter un langage,
+         voir js/data/ à la place. -->
     <div class="controls">
       <div class="search-row">
         <div class="field">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="search" id="search" placeholder="Rechercher (ex : malloc, printf, git rebase, lambda…)" autocomplete="off">
         </div>
+        <!-- Compteur "X / Y fiches" pendant une recherche, posé par render() -->
         <span class="count-badge" id="count-badge"></span>
       </div>
+      <!-- Onglets principaux : Accueil, C, C++, Arduino, Site Web, Python, Git -->
       <div class="tabs" id="tabs" role="tablist"></div>
+      <!-- Sous-onglets HTML/CSS/JS, affichés seulement sous l'onglet "Site Web" -->
       <div class="subtabs" id="subtabs" role="tablist" hidden></div>
     </div>
 
+    <!-- Contenu principal : entièrement généré par render() dans js/app.js
+         (grille de présentation sur l'accueil, ou fiches groupées par thème
+         sur les autres onglets / en recherche). Vide dans le HTML de départ. -->
     <div class="panels" id="panels"></div>
     <div class="empty-state" id="empty">Aucun résultat. Essayez un autre mot-clé.</div>
   </div>
 
+  <!-- Chaque fichier ci-dessous ajoute son langage à window.CHEATSHEET_DATA
+       (voir l'en-tête de chacun dans js/data/ pour le schéma attendu).
+       Pour ajouter un langage : créer js/data/monlangage.js sur ce modèle,
+       l'inclure ici (avant js/app.js), puis l'ajouter à NAV_RAW dans js/app.js. -->
   <script src="js/data/accueil.js"></script>
   <script src="js/data/c.js"></script>
   <script src="js/data/cpp.js"></script>
@@ -43,6 +67,7 @@
   <script src="js/data/js.js"></script>
   <script src="js/data/python.js"></script>
   <script src="js/data/git.js"></script>
+  <!-- Doit être chargé APRÈS tous les fichiers de données ci-dessus. -->
   <script src="js/app.js"></script>
 </body>
 </html>

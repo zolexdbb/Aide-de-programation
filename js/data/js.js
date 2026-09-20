@@ -1,5 +1,16 @@
 // Fiches de référence : JavaScript
-// Généré à partir du pense-bête — un objet par groupe de fiches.
+//
+// Schéma : { id, label, color, groups: [ { name, cards: [ { t, d, code } ] } ] }
+//   id/label/color → identifiant, nom et couleur de l'onglet (variable CSS
+//                     définie dans css/style.css, ex. --js-color). Ce fichier
+//                     est chargé sous le sous-onglet "JavaScript" de l'onglet
+//                     groupé "Site Web" (voir NAV_RAW dans js/app.js).
+//   groups[].name   → titre de section affiché (ex. "Bases")
+//   cards[].t       → titre court de la fiche
+//   cards[].d       → description en langage simple (affichée sous le titre)
+//   cards[].code    → extrait affiché tel quel, avec ses propres commentaires //
+// Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
+// l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.js = {
   "id": "js",
