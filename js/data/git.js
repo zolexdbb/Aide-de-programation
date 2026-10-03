@@ -9,11 +9,42 @@
 //   cards[].code    → extrait affiché tel quel, avec ses propres commentaires #
 // Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
 // l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
+// Le champ "guide" (texte affiché en tête de page) est décrit dans js/data/web.js.
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.git = {
   "id": "git",
   "label": "Git",
   "color": "var(--git-color)",
+  "guide": {
+    "resume": "L'historique de votre projet : chaque version enregistrée, la possibilité de revenir en arrière, et la mise en ligne sur GitHub.",
+    "role": "Git enregistre des « photos » successives de votre dossier, appelées commits. Chacune a une date, un auteur et un message. On peut comparer deux versions, revenir à une ancienne, ou travailler sur une idée dans une branche sans casser ce qui marche.\n\nGit travaille sur votre ordinateur. GitHub est un site qui héberge une copie du dépôt : il sert de sauvegarde, permet de travailler à plusieurs et peut même publier un site web gratuitement (GitHub Pages).",
+    "pour": [
+      "Garder l'historique d'un projet et pouvoir annuler une erreur",
+      "Sauvegarder son code en ligne (GitHub)",
+      "Travailler à plusieurs sur les mêmes fichiers",
+      "Mettre un site en ligne avec GitHub Pages"
+    ],
+    "pasPour": [
+      "Les gros fichiers binaires qui changent souvent (vidéos, archives)",
+      "Les mots de passe et clés d'API : un secret publié reste dans l'historique",
+      "Remplacer une sauvegarde complète de l'ordinateur"
+    ],
+    "fichiers": {
+      "texte": "Un dépôt = un dossier de projet. Trois fichiers à la racine le rendent propre et compréhensible :",
+      "arbre": "mon-projet/\n├── .git/               # l'historique, géré par Git : ne jamais y toucher\n├── .gitignore          # ce que Git doit ignorer (fichiers générés, secrets)\n├── README.md           # présentation du projet, affichée par GitHub\n├── index.html\n├── css/\n└── js/",
+      "notes": [
+        "Un dépôt par projet : jamais `git init` dans le dossier Documents ou sur le Bureau entier.",
+        "Créer le `.gitignore` AVANT le premier commit : un fichier déjà enregistré n'est plus ignoré.",
+        "Le README s'écrit en Markdown (voir la page Markdown)."
+      ]
+    },
+    "demarrer": [
+      "Installer Git (git-scm.com), puis régler son nom et son e-mail (fiche « Configuration »).",
+      "Dans le dossier du projet : `git init`, puis `git add .` et `git commit -m \"Premier commit\"`.",
+      "Au quotidien : `git status` pour voir ce qui a changé, `git add`, `git commit`, `git push`.",
+      "Un commit par changement cohérent, avec un message qui dit ce qui a été fait."
+    ]
+  },
   "groups": [
     {
       "name": "Démarrer",
@@ -162,6 +193,31 @@ window.CHEATSHEET_DATA.git = {
           "t": "Alias utiles",
           "d": "Un raccourci personnel pour ne plus avoir à retaper en entier les commandes qu'on utilise le plus souvent.",
           "code": "git config --global alias.co checkout\ngit config --global alias.br branch\ngit config --global alias.st status\ngit config --global alias.ci commit\n\ngit co main   # équivaut désormais à : git checkout main"
+        }
+      ]
+    },
+    {
+      "name": "GitHub au quotidien",
+      "cards": [
+        {
+          "t": "Publier un dossier existant sur GitHub",
+          "d": "Le projet existe déjà sur l'ordinateur et il faut l'envoyer en ligne. Créer d'abord un dépôt VIDE sur github.com (sans README), puis :",
+          "code": "git init                          # transforme le dossier en dépôt\ngit add .                         # prépare tous les fichiers\ngit commit -m \"Premier commit\"\ngit branch -M main                # renomme la branche principale en \"main\"\ngit remote add origin https://github.com/utilisateur/mon-projet.git\ngit push -u origin main           # -u : retient la destination pour les prochains push\n\n# Les fois suivantes, un simple \"git push\" suffit"
+        },
+        {
+          "t": "Mettre un site en ligne avec GitHub Pages",
+          "d": "GitHub peut héberger gratuitement un site statique (HTML, CSS, JS). Le site est republié automatiquement à chaque push.",
+          "code": "# 1. Le dépôt doit contenir un index.html à la racine\n# 2. Sur github.com : Settings > Pages\n#    Source : \"Deploy from a branch\", branche \"main\", dossier \"/ (root)\"\n# 3. Après une ou deux minutes, le site est en ligne à l'adresse :\n#    https://utilisateur.github.io/mon-projet/\n\ngit add .\ngit commit -m \"Corrige le menu sur mobile\"\ngit push                          # le site se met à jour tout seul\n\n# Nom de domaine personnalisé : le fichier CNAME à la racine contient\n# uniquement le domaine (ex : www.monsite.fr). Sans domaine, pas de CNAME."
+        },
+        {
+          "t": "Que mettre (ou pas) dans un dépôt",
+          "d": "On enregistre ce qu'on a écrit à la main, pas ce qui se régénère ni ce qui doit rester secret.",
+          "code": "# À ENREGISTRER\n#   le code source (.html, .css, .js, .py, .c, .ino...)\n#   les images et sons utilisés par le projet\n#   README.md, .gitignore\n\n# À IGNORER — contenu typique d'un .gitignore\nnode_modules/        # dépendances : se réinstallent\n.venv/               # environnement virtuel Python\nbuild/               # fichiers compilés\n*.o\n*.exe\n.env                 # mots de passe, clés d'API\n*.local.js           # outils de développement personnels\n.DS_Store            # fichiers système (macOS)\nThumbs.db            # fichiers système (Windows)"
+        },
+        {
+          "t": ".gitattributes : fins de ligne",
+          "d": "Windows et Linux ne terminent pas les lignes de la même façon, ce qui fait apparaître des fichiers « modifiés » sans raison. Ce fichier, à la racine, règle le problème pour tout le monde.",
+          "code": "# .gitattributes\n* text=auto          # Git normalise les fins de ligne des fichiers texte\n\n*.png binary         # jamais de conversion sur les fichiers binaires\n*.jpg binary\n*.mp3 binary"
         }
       ]
     }

@@ -9,11 +9,42 @@
 //   cards[].code    → extrait affiché tel quel, avec ses propres commentaires //
 // Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
 // l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
+// Le champ "guide" (texte affiché en tête de page) est décrit dans js/data/web.js.
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.c = {
   "id": "c",
   "label": "C",
   "color": "var(--c-color)",
+  "guide": {
+    "resume": "Le langage qui parle presque directement à la machine : rapide, léger, et sans aucun filet de sécurité.",
+    "role": "Le C sert à écrire des programmes qui doivent être rapides et tenir dans très peu de mémoire : systèmes d'exploitation, pilotes de périphériques, microcontrôleurs, moteurs de bases de données. Il ne fait rien à votre place : pas de gestion automatique de la mémoire, pas de chaînes de caractères « toutes faites ».\n\nC'est précisément pour ça qu'on l'apprend. Une fois qu'on a compris les pointeurs et la compilation en C, on comprend ce que font réellement tous les autres langages.",
+    "pour": [
+      "Comprendre la mémoire, les pointeurs et la compilation",
+      "Programmer un microcontrôleur ou un système embarqué",
+      "Écrire du code très rapide et très léger",
+      "Les cours d'algorithmique (BTS, BUT, licence, prépa)"
+    ],
+    "pasPour": [
+      "Un site web ou une interface graphique",
+      "Un petit script vite fait (Python est bien plus adapté)",
+      "Manipuler beaucoup de texte"
+    ],
+    "fichiers": {
+      "texte": "Un fichier `.c` contient le code, un fichier `.h` annonce ce que ce `.c` met à disposition des autres. Dès qu'un programme dépasse une centaine de lignes, on le découpe ainsi :",
+      "arbre": "mon-projet/\n├── main.c          # point d'entrée : contient main()\n├── calcul.c        # le code des fonctions de calcul\n├── calcul.h        # leurs prototypes, à inclure avec #include \"calcul.h\"\n├── Makefile        # la recette de compilation (facultatif mais pratique)\n└── build/          # fichiers générés (.o, exécutable) : à ignorer dans Git",
+      "notes": [
+        "`#include <stdio.h>` cherche dans les bibliothèques du système, `#include \"calcul.h\"` dans votre projet.",
+        "Un `.h` ne contient que des prototypes, des `struct` et des constantes : jamais le code des fonctions.",
+        "L'exécutable et les fichiers `.o` se régénèrent : on ne les met pas dans Git."
+      ]
+    },
+    "demarrer": [
+      "Installer un compilateur : `gcc` (via MinGW ou WSL sous Windows, déjà présent sous Linux, `xcode-select --install` sous macOS).",
+      "Écrire un fichier `main.c` à partir de la fiche « Squelette d'un programme ».",
+      "Compiler avec `gcc main.c -o programme -Wall`, puis lancer `./programme`.",
+      "Lire les avertissements : `-Wall` signale la plupart des erreurs de débutant avant même l'exécution."
+    ]
+  },
   "groups": [
     {
       "name": "Bases & compilation",
@@ -232,6 +263,21 @@ window.CHEATSHEET_DATA.c = {
           "t": "Modes & positionnement",
           "d": "D'autres façons d'ouvrir un fichier (lecture, écriture, ajout...) et comment se déplacer à un endroit précis à l'intérieur, plutôt que de le lire du début à la fin.",
           "code": "// \"r\" lecture   \"w\" écriture (écrase)   \"a\" ajout à la fin\n// \"r+\" lecture+écriture   \"rb\"/\"wb\" mode binaire\n\nfseek(f, 0, SEEK_SET); // replace le curseur au début du fichier\nlong pos = ftell(f);    // position actuelle dans le fichier\nrewind(f);               // raccourci pour revenir au début"
+        }
+      ]
+    },
+    {
+      "name": "Organiser un projet",
+      "cards": [
+        {
+          "t": "Découper en plusieurs fichiers (.h / .c)",
+          "d": "Le .h annonce les fonctions, le .c les écrit, et main.c les utilise. Chaque fichier reste court et on retrouve tout de suite où se trouve une fonction.",
+          "code": "// ----- calcul.h : ce que le module met à disposition -----\n#ifndef CALCUL_H        // garde d'inclusion : évite d'inclure deux fois le fichier\n#define CALCUL_H\n\nint addition(int a, int b);   // prototype seulement, pas de code\n\n#endif\n\n// ----- calcul.c : le code -----\n#include \"calcul.h\"\n\nint addition(int a, int b) {\n    return a + b;\n}\n\n// ----- main.c : l'utilisation -----\n#include <stdio.h>\n#include \"calcul.h\"\n\nint main(void) {\n    printf(\"%d\\n\", addition(2, 3));\n    return 0;\n}\n\n// Compilation : gcc main.c calcul.c -o programme -Wall"
+        },
+        {
+          "t": "Makefile minimal",
+          "d": "Un fichier nommé Makefile qui retient la commande de compilation à votre place : il suffit ensuite de taper make. Attention, les lignes de commande doivent commencer par une vraie tabulation.",
+          "code": "# Makefile — à placer à la racine du projet\nCC = gcc\nCFLAGS = -Wall -Wextra\n\nprogramme: main.c calcul.c calcul.h\n\t$(CC) $(CFLAGS) main.c calcul.c -o programme\n\nclean:\n\trm -f programme\n\n# Dans le terminal :\n#   make         -> compile (seulement si un fichier a changé)\n#   make clean   -> supprime l'exécutable"
         }
       ]
     }

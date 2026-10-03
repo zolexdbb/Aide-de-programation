@@ -11,11 +11,41 @@
 //   cards[].code    → extrait affiché tel quel, avec ses propres commentaires //
 // Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
 // l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
+// Le champ "guide" (texte affiché en tête de page) est décrit dans js/data/web.js.
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.html = {
   "id": "html",
   "label": "HTML",
   "color": "var(--html-color)",
+  "guide": {
+    "resume": "Le contenu et la structure de la page : titres, paragraphes, images, liens, formulaires.",
+    "role": "Le HTML décrit CE QU'IL Y A dans une page, pas à quoi elle ressemble : ceci est un titre, ceci est un paragraphe, ceci est un menu. Ce n'est pas un langage de programmation : pas de calcul, pas de condition, seulement des balises qui encadrent du contenu.\n\nUn site se construit toujours dans le même ordre : d'abord le HTML (le contenu), ensuite le CSS (l'apparence), enfin le JavaScript (le comportement). Une page bien structurée en HTML reste lisible même si le CSS ne charge pas, et c'est elle que lisent Google et les lecteurs d'écran.",
+    "pour": [
+      "Structurer le contenu d'une page web",
+      "Créer des liens, des formulaires, des tableaux",
+      "Intégrer des images, des vidéos, du son",
+      "Rendre un site compréhensible par les moteurs de recherche"
+    ],
+    "pasPour": [
+      "Choisir les couleurs, les tailles, la mise en page (c'est le CSS)",
+      "Réagir à un clic ou faire un calcul (c'est JavaScript)",
+      "Enregistrer des données (il faut du JavaScript ou un serveur)"
+    ],
+    "fichiers": {
+      "texte": "La page d'accueil s'appelle toujours `index.html` : c'est le fichier que le navigateur ouvre par défaut. Les autres pages se placent à côté.",
+      "arbre": "mon-site/\n├── index.html          # page d'accueil (nom obligatoire)\n├── contact.html        # autre page, liée avec <a href=\"contact.html\">\n├── css/\n│   └── style.css\n├── js/\n│   └── app.js\n└── img/\n    └── logo.png",
+      "notes": [
+        "Aucun style dans le HTML (`style=\"...\"`) et aucun script dans les balises (`onclick=\"...\"`) : chaque langage dans son fichier.",
+        "L'organisation complète d'un site est détaillée dans la page « Organiser son site »."
+      ]
+    },
+    "demarrer": [
+      "Créer un dossier, puis un fichier `index.html` dedans.",
+      "Y coller la fiche « Squelette de page ».",
+      "Double-cliquer sur le fichier : il s'ouvre dans le navigateur. Après chaque modification, enregistrer puis actualiser (F5).",
+      "Faire un clic droit > Inspecter (ou F12) pour voir la structure de n'importe quelle page."
+    ]
+  },
   "groups": [
     {
       "name": "Structure",
@@ -139,6 +169,41 @@ window.CHEATSHEET_DATA.html = {
           "t": "Oublier l'attribut alt",
           "d": "Sans alt, une image reste totalement invisible pour une personne malvoyante utilisant un lecteur d'écran, et n'affiche rien de compréhensible si le fichier ne charge pas.",
           "code": "<img src=\"graphique-ventes.png\">              <!-- mauvais : aucune description -->\n<img src=\"graphique-ventes.png\" alt=\"\">        <!-- ok seulement si l'image est purement décorative -->\n<img src=\"graphique-ventes.png\" alt=\"Ventes en hausse de 20% au T3\"> <!-- bien -->"
+        }
+      ]
+    },
+    {
+      "name": "Les détails d'un site fini",
+      "cards": [
+        {
+          "t": "Icône d'onglet (favicon)",
+          "d": "La petite image affichée dans l'onglet du navigateur et dans les favoris. Sans elle, le site a l'air inachevé.",
+          "code": "<head>\n    <!-- type doit correspondre au VRAI format du fichier -->\n    <link rel=\"icon\" type=\"image/png\" href=\"img/logo.png\">\n    <!-- autres formats : image/webp, image/x-icon (.ico) -->\n\n    <!-- un SVG reste net à toutes les tailles -->\n    <link rel=\"icon\" type=\"image/svg+xml\" href=\"img/logo.svg\">\n</head>"
+        },
+        {
+          "t": "Navigation : signaler la page active",
+          "d": "aria-current indique aux lecteurs d'écran quel lien correspond à la page affichée, et sert en même temps de sélecteur CSS pour le mettre en évidence.",
+          "code": "<nav aria-label=\"Navigation principale\">\n    <a href=\"index.html\" aria-current=\"page\">Accueil</a>\n    <a href=\"regles.html\">Règles</a>\n    <a href=\"roles.html\">Rôles</a>\n</nav>\n\n<!-- Dans le CSS, pas besoin de classe \"active\" :\n     nav a[aria-current=\"page\"] { font-weight: 600; } -->"
+        },
+        {
+          "t": "Lien d'évitement (aller au contenu)",
+          "d": "Premier lien de la page, invisible sauf au clavier : il permet de sauter le menu au lieu d'appuyer vingt fois sur Tab.",
+          "code": "<body>\n    <a class=\"lien-evitement\" href=\"#contenu\">Aller au contenu</a>\n    <header>...</header>\n    <nav>...</nav>\n    <main id=\"contenu\" tabindex=\"-1\">...</main>\n</body>\n\n<!-- CSS : hors écran, puis visible quand il reçoit le focus\n     .lien-evitement { position: absolute; top: -60px; }\n     .lien-evitement:focus { top: 8px; } -->"
+        },
+        {
+          "t": "Liens externes & téléchargement",
+          "d": "Ouvrir un lien dans un nouvel onglet sans risque, et proposer un fichier à télécharger plutôt qu'à afficher.",
+          "code": "<!-- Nouvel onglet : rel=\"noopener\" empêche la page ouverte\n     de prendre le contrôle de la vôtre -->\n<a href=\"https://www.hse.gov.uk\" target=\"_blank\" rel=\"noopener\">Site du HSE</a>\n\n<!-- Téléchargement : download force l'enregistrement\n     (et peut renommer le fichier) -->\n<a href=\"fichiers/modpack.zip\" download=\"modpack-v2.zip\">Télécharger le modpack</a>\n\n<!-- Adresse e-mail et téléphone -->\n<a href=\"mailto:contact@exemple.fr\">Écrire</a>\n<a href=\"tel:+33123456789\">Appeler</a>"
+        },
+        {
+          "t": "Icône SVG plutôt qu'un emoji",
+          "d": "Un emoji change d'apparence selon l'appareil et ne prend pas la couleur du texte. Une icône SVG reste identique partout et suit la couleur du texte grâce à currentColor.",
+          "code": "<button type=\"button\">\n    <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\"\n         stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n        <circle cx=\"11\" cy=\"11\" r=\"7\"/>\n        <line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/>\n    </svg>\n    Rechercher\n</button>\n\n<!-- aria-hidden=\"true\" : l'icône est décorative, le texte suffit.\n     Bouton sans texte ? Ajouter aria-label=\"Rechercher\" sur le bouton.\n     Icônes libres : lucide.dev, phosphoricons.com, heroicons.com -->"
+        },
+        {
+          "t": "Liste à cocher",
+          "d": "Placer la case DANS le label rend tout le texte cliquable, sans avoir à relier les deux avec for et id.",
+          "code": "<ul class=\"liste-a-cocher\">\n    <li><label><input type=\"checkbox\"> <span>Sols propres et secs</span></label></li>\n    <li><label><input type=\"checkbox\"> <span>Câbles rangés</span></label></li>\n    <li><label><input type=\"checkbox\" checked> <span>Éclairage suffisant</span></label></li>\n</ul>"
         }
       ]
     }

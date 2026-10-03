@@ -9,11 +9,42 @@
 //   cards[].code    → extrait affiché tel quel, avec ses propres commentaires #
 // Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
 // l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
+// Le champ "guide" (texte affiché en tête de page) est décrit dans js/data/web.js.
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.python = {
   "id": "python",
   "label": "Python",
   "color": "var(--python-color)",
+  "guide": {
+    "resume": "Un langage lisible et polyvalent : scripts, automatisation, analyse de données, intelligence artificielle.",
+    "role": "Python sert à obtenir un résultat vite, avec peu de lignes. Il n'y a rien à compiler : on écrit un fichier `.py`, on le lance, il s'exécute. Sa force est son immense collection de bibliothèques : lire un fichier Excel, tracer un graphique, interroger un site, entraîner un modèle d'IA, tout existe déjà.\n\nIl est plus lent que le C, mais dans la plupart des cas cela n'a aucune importance : le temps gagné à écrire le programme compte bien plus que celui gagné à l'exécuter.",
+    "pour": [
+      "Apprendre à programmer",
+      "Automatiser une tâche répétitive (renommer des fichiers, trier des données)",
+      "Analyse de données, graphiques, calcul scientifique",
+      "Intelligence artificielle, bots Discord, petits serveurs web"
+    ],
+    "pasPour": [
+      "Le code qui tourne dans un navigateur (c'est le rôle de JavaScript)",
+      "Les microcontrôleurs très limités en mémoire",
+      "Les jeux ou calculs où chaque milliseconde compte"
+    ],
+    "fichiers": {
+      "texte": "Pour un exercice, un seul fichier suffit. Pour un vrai projet, on sépare le code, les dépendances et l'environnement virtuel :",
+      "arbre": "mon-projet/\n├── main.py             # point d'entrée : c'est lui qu'on lance\n├── outils.py           # fonctions réutilisables (import outils)\n├── donnees/            # fichiers lus ou écrits par le programme\n│   └── notes.csv\n├── requirements.txt    # liste des bibliothèques à installer\n├── .venv/              # environnement virtuel : à ignorer dans Git\n└── README.md           # à quoi sert le projet, comment le lancer",
+      "notes": [
+        "Noms de fichiers en minuscules, sans espace ni accent, sinon `import` ne fonctionne pas.",
+        "Ne nommez jamais un fichier comme une bibliothèque (`random.py`, `math.py`) : Python importerait le vôtre à la place.",
+        "`pip freeze > requirements.txt` enregistre les bibliothèques installées, `pip install -r requirements.txt` les réinstalle ailleurs."
+      ]
+    },
+    "demarrer": [
+      "Installer Python depuis python.org (sous Windows, cocher « Add Python to PATH »).",
+      "Vérifier dans un terminal : `python --version`.",
+      "Créer un fichier `main.py`, y écrire `print(\"Bonjour\")`, puis lancer `python main.py`.",
+      "Pour un vrai projet, créer un environnement virtuel (voir la fiche « Environnement virtuel »)."
+    ]
+  },
   "groups": [
     {
       "name": "Bases",
@@ -172,6 +203,26 @@ window.CHEATSHEET_DATA.python = {
           "t": "Environnement virtuel",
           "d": "Un dossier isolé où installer les bibliothèques d'UN SEUL projet, pour éviter que deux projets différents n'entrent en conflit s'ils ont besoin de versions différentes d'une même bibliothèque.",
           "code": "python -m venv env             # crée l'environnement dans le dossier \"env\"\nsource env/bin/activate         # active l'environnement (Linux/Mac)\nenv\\Scripts\\activate            # active l'environnement (Windows)\n\npip install requests             # installe une bibliothèque dans l'environnement actif\npip freeze > requirements.txt     # exporte la liste des bibliothèques installées"
+        }
+      ]
+    },
+    {
+      "name": "Organiser un projet & outils",
+      "cards": [
+        {
+          "t": "Point d'entrée : if __name__ == \"__main__\"",
+          "d": "Permet à un fichier d'être à la fois lancé directement ET importé par un autre, sans que son code de test s'exécute lors de l'import.",
+          "code": "# outils.py\ndef moyenne(notes):\n    return sum(notes) / len(notes)\n\nif __name__ == \"__main__\":\n    # Exécuté seulement avec \"python outils.py\",\n    # pas quand un autre fichier fait \"import outils\"\n    print(moyenne([12, 15, 9]))\n\n# main.py\nimport outils\nprint(outils.moyenne([10, 20]))   # le test ci-dessus ne s'affiche pas"
+        },
+        {
+          "t": "Serveur web local en une ligne",
+          "d": "Python sait servir un dossier comme un vrai site web, sans rien installer. Indispensable pour tester un site HTML quand le double-clic sur index.html ne suffit plus (fetch, modules).",
+          "code": "# Dans le terminal, depuis le dossier du site :\npython -m http.server 5500\n\n# Puis ouvrir http://localhost:5500 dans le navigateur\n# Ctrl + C dans le terminal pour arrêter le serveur"
+        },
+        {
+          "t": "Chemins de fichiers avec pathlib",
+          "d": "Construit des chemins qui fonctionnent sous Windows comme sous Linux, et qui ne dépendent pas du dossier depuis lequel on lance le script.",
+          "code": "from pathlib import Path\n\n# Dossier du script en cours, quel que soit l'endroit d'où on le lance\ndossier = Path(__file__).parent\nfichier = dossier / \"donnees\" / \"notes.csv\"   # / assemble les morceaux\n\nprint(fichier.exists())         # True si le fichier existe\nprint(fichier.suffix)           # \".csv\"\ntexte = fichier.read_text(encoding=\"utf-8\")\n\n# Tous les .csv du dossier\nfor f in (dossier / \"donnees\").glob(\"*.csv\"):\n    print(f.name)"
         }
       ]
     }

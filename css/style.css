@@ -1,534 +1,646 @@
-/* Palette "claire" par défaut : couleurs neutres de l'interface (bg, surface,
-   texte, bordures) puis une couleur d'identité par langage, réutilisée pour
-   les onglets, les bandes de couleur des fiches et les boutons de l'accueil. */
+/* ==========================================================================
+   Mise en forme du site. Sections, dans l'ordre de la page :
+   1. Variables (couleurs, polices, dimensions)   5. Page d'accueil
+   2. Base                                        6. Page d'un langage (guide, fiches)
+   3. Barre du haut                               7. Petits écrans
+   4. Barre latérale                              8. Préférences d'accessibilité
+   ========================================================================== */
+
+/* ---------- 1. Variables ---------- */
+
+/* Thème clair par défaut. Changer une couleur ici la change sur tout le site. */
 :root {
-    --bg: #f6f5f2;
-    --surface: #ffffff;
-    --surface-2: #edece7;
-    --border: #ddd9d0;
-    --text: #1c1d1f;
-    --text-dim: #6a6d74;
-    --accent: #3457d5;
-    --accent-soft: #e8ecfd;
-    --code-bg: #1c1d1f;
-    --code-text: #e9e9e6;
-    --code-dim: #8b8d94;
-    --shadow: 0 1px 2px rgba(20,20,20,.04), 0 8px 24px rgba(20,20,20,.05);
-    --radius: 12px;
+  --bg: #ffffff;
+  --bg-subtle: #f7f7f5;
+  --border: #e3e3df;
+  --border-strong: #c6c6c0;
+  --text: #1b1c1e;
+  --text-dim: #5c6066;
+  --accent: #15803d;
+  --accent-bg: #ecf6ef;
+  --danger: #b42318;
+  --code-bg: #f7f7f5;
+  --code-text: #24262b;
+  --code-comment: #686d75;
 
-    --accueil-color: #3457d5;
-    --c-color: #3457d5;
-    --cpp-color: #a2402c;
-    --arduino-color: #00878f;
-    --web-color: #6d3fd1;
-    --html-color: #c1440e;
-    --css-color: #1b5fc1;
-    --js-color: #9c7a00;
-    --python-color: #b58c00;
-    --git-color: #b0431e;
-  }
+  /* Une couleur par langage : sert uniquement de repère (petit carré), jamais de fond. */
+  --accueil-color: var(--accent);
+  --c-color: #5676d8;
+  --cpp-color: #b0457a;
+  --arduino-color: #00979d;
+  --python-color: #3f8fbf;
+  --web-color: #7c5cd6;
+  --html-color: #e4572e;
+  --css-color: #2f7fd6;
+  --js-color: #d9a600;
+  --git-color: #a0522d;
+  --markdown-color: #6b7280;
 
-  /* Mode sombre automatique (suit les préférences du système), sauf si l'utilisateur
-     a explicitement choisi le thème clair via data-theme="light" sur <html>. */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #131417;
-      --surface: #1b1c20;
-      --surface-2: #202226;
-      --border: #2d2f35;
-      --text: #ecebe7;
-      --text-dim: #9497a0;
-      --accent: #7b93ff;
-      --accent-soft: #262b45;
-      --code-bg: #0e0f11;
-      --code-text: #e9e9e6;
-      --code-dim: #7d808a;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  --font-text: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-code: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+  --radius: 6px;
+  --topbar-h: 56px;
+  --sidebar-w: 248px;
+}
 
-      --accueil-color: #7b93ff;
-      --c-color: #7b93ff;
-      --cpp-color: #e08767;
-      --arduino-color: #4fc7cf;
-      --web-color: #b294ff;
-      --html-color: #f08a53;
-      --css-color: #6fa8ff;
-      --js-color: #f0d264;
-      --python-color: #f0c85a;
-      --git-color: #f08a63;
-    }
+/* Thème sombre : automatique si le système le demande (sauf choix manuel du
+   thème clair), ou forcé par le bouton de la barre du haut (data-theme="dark"). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1113;
+    --bg-subtle: #15181b;
+    --border: #272b30;
+    --border-strong: #3d434a;
+    --text: #e7e7e4;
+    --text-dim: #9ba1a8;
+    --accent: #4ade80;
+    --accent-bg: #14261b;
+    --danger: #f97066;
+    --code-bg: #0a0c0d;
+    --code-text: #dcdcd8;
+    --code-comment: #868c94;
   }
-  /* Mode sombre forcé (même palette que ci-dessus), pour un futur bouton de
-     bascule manuelle qui poserait data-theme="dark" sur <html>. */
-  :root[data-theme="dark"] {
-    --bg: #131417;
-    --surface: #1b1c20;
-    --surface-2: #202226;
-    --border: #2d2f35;
-    --text: #ecebe7;
-    --text-dim: #9497a0;
-    --accent: #7b93ff;
-    --accent-soft: #262b45;
-    --code-bg: #0e0f11;
-    --code-text: #e9e9e6;
-    --code-dim: #7d808a;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+}
+:root[data-theme="dark"] {
+  --bg: #0f1113;
+  --bg-subtle: #15181b;
+  --border: #272b30;
+  --border-strong: #3d434a;
+  --text: #e7e7e4;
+  --text-dim: #9ba1a8;
+  --accent: #4ade80;
+  --accent-bg: #14261b;
+  --danger: #f97066;
+  --code-bg: #0a0c0d;
+  --code-text: #dcdcd8;
+  --code-comment: #868c94;
+}
 
-    --accueil-color: #7b93ff;
-    --c-color: #7b93ff;
-    --cpp-color: #e08767;
-    --arduino-color: #4fc7cf;
-    --web-color: #b294ff;
-    --html-color: #f08a53;
-    --css-color: #6fa8ff;
-    --js-color: #f0d264;
-    --python-color: #f0c85a;
-    --git-color: #f08a63;
-  }
+/* ---------- 2. Base ---------- */
 
-  * { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 
-  body {
-    background-color: var(--bg);
-    /* Halo dégradé multicolore, fixé au viewport (pas au contenu) : il reste
-       visible en haut de l'écran quoi qu'on fasse défiler en dessous. */
-    background-image:
-      radial-gradient(ellipse 45vw 40vh at 18% 0%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 70%),
-      radial-gradient(ellipse 45vw 40vh at 82% 8%, color-mix(in srgb, var(--web-color) 18%, transparent) 0%, transparent 70%),
-      radial-gradient(ellipse 50vw 35vh at 50% 28%, color-mix(in srgb, var(--html-color) 12%, transparent) 0%, transparent 70%);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    color: var(--text);
-    font-family: 'Manrope', system-ui, -apple-system, "Segoe UI", sans-serif;
-    padding-inline: 0;
-    -webkit-font-smoothing: antialiased;
-  }
+html { scroll-padding-top: calc(var(--topbar-h) + 16px); }
 
-  /* Conteneur centré de toute la page ; sa largeur borne aussi la largeur
-     des grilles de fiches (.cards, .intro-grid) puisqu'elles héritent de lui. */
-  .page {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding-inline: 24px;
-    padding-block: 32px 72px;
-  }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
 
-  /* En-tête : titre, accroche et compteur, centrés comme une vraie page d'accueil. */
-  header.hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
-    padding-block: 40px 34px;
-    margin-bottom: 8px;
-  }
-  header.hero .eyebrow {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11.5px;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--accent);
-    background: var(--accent-soft);
-    border-radius: 999px;
-    padding: 6px 16px;
-  }
-  header.hero h1 {
-    font-family: 'Sora', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: clamp(28px, 5vw, 42px);
-    margin: 0;
-    text-wrap: balance;
-  }
-  header.hero p {
-    color: var(--text-dim);
-    margin: 0;
-    margin-inline: auto;
-    font-size: 15px;
-    line-height: 1.6;
-    max-width: 62ch;
-  }
-  header.hero p code {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 12.5px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1px 5px;
-    color: var(--text);
-  }
-  header.hero .meta {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11.5px;
-    color: var(--text-dim);
-    margin-top: 2px;
-  }
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+button { font: inherit; color: inherit; cursor: pointer; }
 
-  /* Barre collante (recherche + onglets) : reste visible en haut au scroll.
-     Fond semi-transparent + flou plutôt qu'une couleur pleine, pour laisser
-     deviner le dégradé du body derrière au lieu d'une bande unie tranchée. */
-  .controls {
-    position: sticky;
-    top: env(safe-area-inset-top, 0px);
-    z-index: 5;
-    background: color-mix(in srgb, var(--bg) 78%, transparent);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    padding-block: 12px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 18px;
-  }
+code, pre, kbd { font-family: var(--font-code); }
 
-  .search-row {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    align-items: center;
-  }
-  .search-row .field { position: relative; flex: 0 1 560px; }
-  .search-row input {
-    width: 100%;
-    font: inherit;
-    font-size: 15px;
-    padding: 12px 18px 12px 40px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    box-shadow: var(--shadow);
-  }
-  .search-row input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
-  .search-row svg {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    translate: 0 -50%;
-    color: var(--text-dim);
-    pointer-events: none;
-  }
-  .count-badge {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11.5px;
-    color: var(--text-dim);
-    white-space: nowrap;
-    flex: none;
-  }
+/* Petit morceau de code dans une phrase. */
+:not(pre) > code {
+  font-size: .88em;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
 
-  /* Onglets principaux. --tab-color est posée en JS (voir buildTabs) sur
-     chaque bouton, avec la couleur du langage correspondant. */
-  .tabs {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+[hidden] { display: none !important; }
+
+/* Lien d'évitement : invisible, sauf quand on y arrive au clavier. */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 20;
+  background: var(--text);
+  color: var(--bg);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+}
+.skip-link:focus { top: 8px; }
+
+/* Petit libellé en capitales, utilisé pour les titres de rubrique. */
+.label {
+  font-family: var(--font-code);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* Carré de couleur du langage (--swatch est posée en JS). */
+.swatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--swatch, var(--border-strong));
+}
+
+/* ---------- 3. Barre du haut ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-inline: 20px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(var(--sidebar-w) - 20px);
+  flex: none;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand-mark {
+  font-family: var(--font-code);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bg);
+  background: var(--accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.search {
+  position: relative;
+  flex: 1 1 auto;
+  max-width: 520px;
+}
+.search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  translate: 0 -50%;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.search input {
+  width: 100%;
+  height: 38px;
+  font: inherit;
+  color: var(--text);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 44px 0 36px;
+}
+.search input::placeholder { color: var(--text-dim); }
+.search input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  background: var(--bg);
+}
+.search kbd {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  translate: 0 -50%;
+  font-size: 12px;
+  color: var(--text-dim);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 0 6px;
+  pointer-events: none;
+}
+.search input:focus ~ kbd { display: none; }
+
+.icon-btn {
+  margin-left: auto;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  transition: color .15s, border-color .15s;
+}
+.icon-btn:hover { color: var(--text); border-color: var(--border-strong); }
+/* Le bouton montre le thème vers lequel on bascule : lune en clair, soleil en sombre. */
+.icon-btn .icon-sun { display: none; }
+:root[data-theme="dark"] .icon-btn .icon-sun { display: block; }
+:root[data-theme="dark"] .icon-btn .icon-moon { display: none; }
+
+/* ---------- 4. Barre latérale ---------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+.sidebar {
+  position: sticky;
+  top: var(--topbar-h);
+  height: calc(100vh - var(--topbar-h));
+  overflow-y: auto;
+  padding: 20px 12px 40px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nav-group { display: flex; flex-direction: column; gap: 2px; }
+.nav-group .label { padding: 0 10px 6px; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.nav-link:hover { background: var(--bg-subtle); color: var(--text); }
+.nav-link[aria-current="page"] {
+  background: var(--accent-bg);
+  color: var(--text);
+  font-weight: 500;
+}
+.nav-count {
+  margin-left: auto;
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Sommaire de la page active, sous son lien. */
+.nav-sections {
+  display: flex;
+  flex-direction: column;
+  margin: 2px 0 6px 13px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+}
+.nav-sections button {
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+.nav-sections button:hover { color: var(--text); background: var(--bg-subtle); }
+
+/* ---------- 5. Contenu : éléments communs et accueil ---------- */
+
+main {
+  min-width: 0;
+  padding: 36px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+main:focus { outline: none; }
+
+.page-head { display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+.page-head h1 {
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+}
+.page-head .lead { color: var(--text-dim); font-size: 16px; }
+.page-head .meta {
+  font-family: var(--font-code);
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.block { display: flex; flex-direction: column; gap: 14px; }
+.block > h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.block > h2 .count {
+  font-family: var(--font-code);
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--text-dim);
+}
+.block > .hint { color: var(--text-dim); max-width: 70ch; }
+
+/* Parcours conseillés. */
+.paths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.path {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.path h3 { font-size: 15px; font-weight: 600; }
+.path p { color: var(--text-dim); font-size: 14px; }
+.path ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+.path li { display: flex; align-items: center; gap: 6px; }
+.path li + li::before { content: "→"; color: var(--text-dim); }
+.path a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.path a:hover { border-color: var(--border-strong); background: var(--bg-subtle); }
+
+/* Liste des aide-mémoire : chaque ligne est un lien entier. */
+.intros {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.intro:hover { border-color: var(--border-strong); background: var(--bg-subtle); }
+.intro-top { display: flex; align-items: center; gap: 10px; }
+.intro-top h3 { font-size: 16px; font-weight: 600; }
+.intro-top .nav-count { font-size: 12.5px; }
+.intro-tag { font-size: 14px; font-weight: 500; }
+.intro-text { font-size: 14px; color: var(--text-dim); }
+
+/* Astuces d'utilisation. */
+.tips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px 32px;
+}
+.tips li { font-size: 14px; color: var(--text-dim); }
+.tips strong { display: block; color: var(--text); font-weight: 600; }
+.tips kbd {
+  font-size: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 0 5px;
+}
+
+/* ---------- 6. Page d'un langage ---------- */
+
+/* Guide repliable en tête de page. */
+.guide {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.guide > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius);
+}
+.guide > summary::-webkit-details-marker { display: none; }
+.guide > summary:hover { background: var(--bg-subtle); }
+.guide > summary svg { flex: none; color: var(--text-dim); transition: rotate .15s; }
+.guide[open] > summary svg { rotate: 90deg; }
+.guide > summary .label { margin-left: auto; font-weight: 400; }
+
+.guide-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px 40px;
+  padding: 8px 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.guide-part { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; }
+.guide-part.wide { grid-column: 1 / -1; }
+.guide-part p { max-width: 75ch; }
+.guide-part li { position: relative; padding-left: 22px; font-size: 14.5px; }
+
+.list-yes li::before,
+.list-no li::before,
+.list-note li::before {
+  position: absolute;
+  left: 0;
+  font-family: var(--font-code);
+  font-weight: 500;
+}
+.list-yes li::before { content: "+"; color: var(--accent); }
+.list-no li::before { content: "×"; color: var(--danger); }
+.list-note li::before { content: "–"; color: var(--text-dim); }
+.list-note li { color: var(--text-dim); }
+
+.steps { counter-reset: step; display: flex; flex-direction: column; gap: 6px; }
+.steps li { counter-increment: step; padding-left: 30px; }
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-code);
+  font-size: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  color: var(--text-dim);
+}
+
+.tree {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--code-text);
+  overflow-x: auto;
+}
+
+/* Fiches. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.card {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.card-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  padding: 12px 14px;
+}
+.card-head h3 { font-size: 15px; font-weight: 600; line-height: 1.4; }
+.card-head p {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition: color .15s, border-color .15s;
+}
+.copy-btn:hover { color: var(--text); border-color: var(--border-strong); }
+.copy-btn[data-copied="true"] { color: var(--accent); border-color: var(--accent); }
+
+.card pre {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--code-bg);
+  border-top: 1px solid var(--border);
+  /* Le code revient à la ligne plutôt que de défiler horizontalement. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--code-text);
+  tab-size: 2;
+}
+.com { color: var(--code-comment); font-style: italic; }
+
+/* Liens précédent / suivant en bas de page. */
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.pager a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 500;
+  transition: border-color .15s, background .15s;
+}
+.pager a:hover { border-color: var(--border-strong); background: var(--bg-subtle); }
+.pager .next { margin-left: auto; text-align: right; }
+
+.empty {
+  padding: 48px 0;
+  color: var(--text-dim);
+  max-width: 60ch;
+}
+.empty strong { display: block; color: var(--text); font-size: 16px; margin-bottom: 4px; }
+
+/* ---------- 7. Petits écrans ---------- */
+
+@media (max-width: 900px) {
+  .layout { display: block; }
+
+  .brand { width: auto; }
+  .brand-name { display: none; }
+  .search kbd { display: none; }
+  .search input { padding-right: 12px; }
+
+  /* La barre latérale devient une rangée de liens à faire défiler. */
+  .sidebar {
+    height: auto;
+    flex-direction: row;
+    gap: 4px;
+    padding: 8px 12px;
     overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: thin;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    z-index: 9;
+    scrollbar-width: none;
   }
-  .tabs::-webkit-scrollbar { height: 6px; }
-  .tabs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .nav-group { flex-direction: row; flex: none; gap: 4px; }
+  .nav-group .label, .nav-count, .nav-sections { display: none; }
+  .nav-link { min-height: 40px; white-space: nowrap; }
 
-  .tab {
-    --tab-color: var(--accent);
-    flex: none;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-dim);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    transition: background .15s, color .15s, border-color .15s;
-  }
-  .tab .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--tab-color);
-    flex: none;
-  }
-  .tab:hover { border-color: var(--tab-color); color: var(--text); }
-  .tab[aria-selected="true"] {
-    background: var(--tab-color);
-    border-color: var(--tab-color);
-    color: #fff;
-  }
-  .tab[aria-selected="true"] .dot { background: #fff; }
+  main { padding: 24px 16px 64px; gap: 28px; }
+  .guide-body { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  .intros { grid-template-columns: minmax(0, 1fr); }
+  .copy-btn { height: 36px; padding: 0 10px; }
+  .icon-btn { width: 40px; height: 40px; }
+}
 
-  /* Sous-onglets (HTML / CSS / JavaScript sous "Site Web"). Générés/masqués
-     dynamiquement par buildSubtabs() selon l'onglet principal actif. */
-  .subtabs {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .subtabs[hidden] { display: none; }
+/* ---------- 8. Préférences d'accessibilité ---------- */
 
-  .subtab {
-    --tab-color: var(--accent);
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 5px 12px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: background .15s, color .15s, border-color .15s;
-  }
-  .subtab:hover { border-color: var(--tab-color); color: var(--text); }
-  .subtab[aria-selected="true"] {
-    background: var(--tab-color);
-    border-color: var(--tab-color);
-    color: #fff;
-  }
-
-  /* Zone principale où render()/renderLang()/renderAccueil() injectent le
-     contenu : un .section-group par thème (ou par langage en recherche globale). */
-  .panels { display: flex; flex-direction: column; gap: 30px; }
-
-  .section-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  /* --group-color est posée en JS (renderLang/renderGlobalSearch) sur le
-     .section-group parent : titre et soulignement reprennent la couleur du langage. */
-  .section-group h2 {
-    font-family: 'Sora', system-ui, sans-serif;
-    font-size: 12px;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    color: var(--group-color, var(--text-dim));
-    margin: 0;
-    padding-bottom: 6px;
-    border-bottom: 2px solid var(--group-color, var(--border));
-  }
-
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 12px;
-    align-items: start;
-  }
-
-  /* Titre + accroche centrés au-dessus de la grille de langages, sur l'accueil. */
-  .accueil-lead {
-    text-align: center;
-    max-width: 60ch;
-    margin: 4px auto 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .accueil-lead h2 {
-    font-family: 'Sora', system-ui, sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
-  }
-  .accueil-lead p {
-    margin: 0;
-    color: var(--text-dim);
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  .intro-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-  }
-
-  /* Carte de présentation d'un langage, sur l'accueil. --card-color est posée
-     en JS (makeIntroCard) depuis le champ "color" de accueil.js. */
-  .intro-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-top: 3px solid var(--card-color, var(--accent));
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  }
-  .intro-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--card-color, var(--accent));
-    box-shadow: 0 2px 4px rgba(20,20,20,.06), 0 14px 28px rgba(20,20,20,.09);
-  }
-  .intro-emoji {
-    font-size: 24px;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: var(--surface-2);
-    background: color-mix(in srgb, var(--card-color, var(--accent)) 16%, var(--surface-2));
-  }
-  .intro-card h3 {
-    margin: 0;
-    font-family: 'Sora', system-ui, sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-  }
-  .intro-tag {
-    margin: -4px 0 0;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--card-color, var(--accent));
-    font-style: italic;
-  }
-  .intro-text {
-    margin: 0;
-    font-size: 13.5px;
-    line-height: 1.6;
-    color: var(--text-dim);
-    flex: 1;
-  }
-  .intro-badge {
-    margin: 0;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 10.5px;
-    letter-spacing: .02em;
-    color: var(--text-dim);
-    background: var(--surface-2);
-    border-radius: 999px;
-    padding: 3px 9px;
-    align-self: flex-start;
-  }
-  .intro-btn {
-    align-self: flex-start;
-    margin-top: 6px;
-    font-family: 'Manrope', system-ui, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-    background: var(--card-color, var(--accent));
-    border: none;
-    border-radius: 999px;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: filter .15s, transform .15s;
-  }
-  .intro-btn:hover { filter: brightness(1.1); transform: translateX(1px); }
-  .intro-btn:focus-visible { outline: 2px solid var(--card-color, var(--accent)); outline-offset: 2px; }
-
-  /* Fiche de code (titre, description, extrait). --group-color vient du
-     .section-group ancêtre : chaque fiche hérite la couleur de sa section. */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-top: 3px solid var(--group-color, var(--border));
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
-  }
-  .card:hover {
-    transform: translateY(-2px);
-    border-color: var(--group-color, var(--accent));
-    box-shadow: 0 2px 4px rgba(20,20,20,.06), 0 14px 28px rgba(20,20,20,.09);
-  }
-  .card-head {
-    padding: 11px 14px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .card-head h3 {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: 'Sora', system-ui, sans-serif;
-  }
-  .card-head p {
-    margin: 0;
-    font-size: 12.5px;
-    color: var(--text-dim);
-    line-height: 1.5;
-  }
-
-  /* Bloc de code : toujours sombre (même en thème clair), comme un terminal,
-     pour un bon contraste et une lecture identique dans les deux thèmes. */
-  .code-wrap {
-    position: relative;
-    background: var(--code-bg);
-  }
-  .code-wrap pre {
-    margin: 0;
-    padding: 12px 14px;
-    /* pre-wrap + overflow-wrap : le code retourne à la ligne au lieu de
-       nécessiter un défilement horizontal pour lire la fin d'une ligne. */
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-    font-size: 12.3px;
-    line-height: 1.6;
-    color: var(--code-text);
-    tab-size: 2;
-  }
-
-  /* Bouton "Copier", superposé en haut à droite du bloc de code (voir makeCard). */
-  .copy-btn {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 10.5px;
-    letter-spacing: .03em;
-    color: var(--code-dim);
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 6px;
-    padding: 4px 8px;
-    cursor: pointer;
-    transition: background .15s, color .15s;
-  }
-  .copy-btn:hover { background: rgba(255,255,255,.14); color: var(--code-text); }
-  .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .copy-btn[data-copied="true"] { color: #7be0a0; border-color: #7be0a0; }
-
-  /* Message affiché quand une recherche ne trouve aucune fiche (voir .visible
-     posée par render()/renderLang()/renderGlobalSearch() côté JS). */
-  .empty-state {
-    text-align: center;
-    color: var(--text-dim);
-    padding-block: 60px;
-    font-size: 14px;
-    display: none;
-  }
-  .empty-state.visible { display: block; }
-
-  /* Renforce l'attribut HTML natif "hidden" (utilisé pour masquer .subtabs). */
-  [hidden] { display: none !important; }
-
-  @media (max-width: 520px) {
-    .cards { grid-template-columns: 1fr; }
-    .count-badge { display: none; }
-  }
-
-  /* Respecte les préférences d'accessibilité : coupe toutes les transitions
-     (hover, apparition, etc.) pour qui a demandé de réduire les animations. */
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
-  }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

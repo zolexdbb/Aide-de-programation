@@ -11,11 +11,42 @@
 //   cards[].code    → extrait affiché tel quel, avec ses propres commentaires //
 // Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
 // l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
+// Le champ "guide" (texte affiché en tête de page) est décrit dans js/data/web.js.
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.js = {
   "id": "js",
   "label": "JavaScript",
   "color": "var(--js-color)",
+  "guide": {
+    "resume": "Le comportement de la page : réagir aux clics, modifier le contenu, charger et enregistrer des données.",
+    "role": "JavaScript est le seul vrai langage de programmation des trois. Il s'exécute dans le navigateur du visiteur et peut tout modifier après le chargement : afficher une fenêtre, filtrer une liste, changer de page sans recharger, sauvegarder une partie.\n\nLa démarche est toujours la même : on récupère un élément de la page, on écoute un évènement (clic, frappe au clavier), et on modifie la page en réponse. Un site peut très bien fonctionner sans JavaScript ; on l'ajoute quand la page doit réagir.",
+    "pour": [
+      "Réagir aux actions : clics, saisie, défilement",
+      "Construire la page à partir de données (liste de rôles, de fiches, de produits)",
+      "Onglets, fenêtres modales, recherche instantanée",
+      "Sauvegarder dans le navigateur (localStorage), jeux par navigateur"
+    ],
+    "pasPour": [
+      "La mise en forme (une classe CSS ajoutée en JS suffit)",
+      "Le contenu fixe de la page (il doit être dans le HTML)",
+      "Garder un secret : tout le code est visible par le visiteur"
+    ],
+    "fichiers": {
+      "texte": "On sépare les données (les textes, les listes) de la logique (ce qui affiche et réagit). Pour changer un texte, on ne touche alors qu'au fichier de données.",
+      "arbre": "js/\n├── donnees.js      # uniquement des données : const roles = [ {...}, {...} ];\n└── app.js          # la logique : affichage, clics, navigation\n\n<!-- Dans index.html, juste avant </body>, dans cet ordre : -->\n<script src=\"js/donnees.js\"></script>\n<script src=\"js/app.js\"></script>",
+      "notes": [
+        "L'ordre des balises `<script>` compte : un fichier ne peut utiliser que ce qui a été chargé avant lui.",
+        "Placer les scripts en fin de `<body>` (ou ajouter `defer`) : sinon le code s'exécute avant que la page existe.",
+        "Pour un gros projet, un dossier par domaine (voir « Organiser son site »)."
+      ]
+    },
+    "demarrer": [
+      "Créer `js/app.js` et le relier en fin de `<body>` avec `<script src=\"js/app.js\"></script>`.",
+      "Y écrire `console.log(\"Bonjour\");` puis ouvrir la console du navigateur (F12 > Console) pour voir le message.",
+      "La console affiche aussi les erreurs, avec le fichier et le numéro de ligne : c'est le premier endroit où regarder quand rien ne se passe.",
+      "Utiliser `const` par défaut, `let` si la valeur change, jamais `var`."
+    ]
+  },
   "groups": [
     {
       "name": "Bases",
@@ -119,6 +150,56 @@ window.CHEATSHEET_DATA.js = {
           "t": "Modifier un tableau/objet passé par référence",
           "d": "Copier un tableau ou un objet avec = ne crée PAS une vraie copie : les deux noms de variable pointent vers la même donnée en mémoire, donc modifier l'un modifie aussi l'autre.",
           "code": "const original = [1, 2, 3];\nconst copie = original;    // ATTENTION : ne copie pas, pointe vers le MÊME tableau\ncopie.push(4);\nconsole.log(original);       // [1, 2, 3, 4] : modifié aussi !\n\nconst vraieCopie = [...original]; // spread : crée un nouveau tableau indépendant\nvraieCopie.push(5);\nconsole.log(original);              // reste inchangé"
+        }
+      ]
+    },
+    {
+      "name": "Recettes pour un vrai site",
+      "cards": [
+        {
+          "t": "Générer du HTML à partir d'un tableau",
+          "d": "Au lieu de recopier dix fois le même bloc HTML, on décrit les données dans un tableau et on laisse JavaScript fabriquer les blocs. Ajouter un élément au tableau suffit pour qu'il apparaisse.",
+          "code": "const risques = [\n    { id: \"stress\", titre: \"Stress au travail\" },\n    { id: \"bruit\",  titre: \"Bruit\" }\n];\n\n// map() transforme chaque objet en morceau de HTML, join(\"\") colle le tout\nconst html = risques\n    .map((r) => `<a class=\"carte\" href=\"#${r.id}\">${r.titre}</a>`)\n    .join(\"\");\n\ndocument.getElementById(\"cartes\").innerHTML = html;\n\n// innerHTML interprète les balises : parfait pour VOS données.\n// Pour du texte saisi par un visiteur, utiliser textContent."
+        },
+        {
+          "t": "Changer de vue selon l'adresse (hashchange)",
+          "d": "Un site d'une seule page qui affiche des vues différentes selon l'ancre (#stress, #accueil). Chaque vue a sa propre adresse : on peut la partager, et le bouton Précédent du navigateur fonctionne.",
+          "code": "// index.html#stress  ->  location.hash vaut \"#stress\"\nfunction afficherVue() {\n    const id = location.hash.slice(1);             // enlève le \"#\"\n    const page = pages.find((p) => p.id === id);\n    if (page) afficherPage(page);\n    else afficherAccueil();                        // ancre vide ou inconnue\n}\n\nwindow.addEventListener(\"hashchange\", afficherVue); // à chaque changement d'ancre\nafficherVue();                                      // et une fois au chargement\n\n// Dans le HTML, de simples liens suffisent : <a href=\"#stress\">Stress</a>"
+        },
+        {
+          "t": "Onglets avec des attributs data-",
+          "d": "Chaque bouton porte le nom de sa section dans un attribut data-onglet. Un seul écouteur gère tous les boutons, sans onclick dans le HTML.",
+          "code": "// HTML : <nav id=\"onglets\">\n//            <button data-onglet=\"regles\">Règles</button>\n//            <button data-onglet=\"roles\">Rôles</button>\n//        </nav>\n//        <section id=\"regles\" class=\"onglet\">...</section>\n//        <section id=\"roles\" class=\"onglet\" hidden>...</section>\n\nfunction montrer(nom) {\n    document.querySelectorAll(\".onglet\").forEach((section) => {\n        section.hidden = section.id !== nom;       // cache tout sauf la section demandée\n    });\n    document.querySelectorAll(\"[data-onglet]\").forEach((bouton) => {\n        bouton.setAttribute(\"aria-selected\", bouton.dataset.onglet === nom);\n    });\n}\n\n// Un seul écouteur sur le parent (délégation d'évènement)\ndocument.getElementById(\"onglets\").addEventListener(\"click\", (e) => {\n    const bouton = e.target.closest(\"[data-onglet]\");\n    if (bouton) montrer(bouton.dataset.onglet);\n});"
+        },
+        {
+          "t": "Fenêtre modale : ouvrir, fermer, touche Échap",
+          "d": "Les trois façons attendues de fermer une fenêtre : le bouton, un clic sur le fond, la touche Échap. Le CSS correspondant est dans la fiche CSS « Fenêtre modale ».",
+          "code": "const fond = document.getElementById(\"modale-fond\");\n\nfunction ouvrirModale(titre, texte) {\n    document.getElementById(\"modale-titre\").textContent = titre;\n    document.getElementById(\"modale-texte\").textContent = texte;\n    fond.classList.add(\"ouverte\");\n    document.body.style.overflow = \"hidden\";   // bloque le défilement derrière\n}\n\nfunction fermerModale() {\n    fond.classList.remove(\"ouverte\");\n    document.body.style.overflow = \"\";\n}\n\ndocument.getElementById(\"modale-fermer\").addEventListener(\"click\", fermerModale);\nfond.addEventListener(\"click\", (e) => {\n    if (e.target === fond) fermerModale();     // clic sur le fond, pas sur la boîte\n});\ndocument.addEventListener(\"keydown\", (e) => {\n    if (e.key === \"Escape\") fermerModale();\n});"
+        },
+        {
+          "t": "Sauvegarder une partie (JSON + localStorage)",
+          "d": "localStorage ne stocke que du texte : on convertit l'objet avec JSON.stringify pour l'enregistrer, et JSON.parse pour le relire. Le try/catch évite que le site plante si le stockage est plein ou bloqué.",
+          "code": "const CLE = \"monJeu_sauvegarde_1\";\n\nfunction sauvegarder(partie) {\n    try {\n        localStorage.setItem(CLE, JSON.stringify(partie));   // objet -> texte\n    } catch (e) {\n        console.error(\"Sauvegarde impossible\", e);\n    }\n}\n\nfunction charger() {\n    try {\n        const brut = localStorage.getItem(CLE);\n        if (!brut) return null;                 // aucune sauvegarde\n        const data = JSON.parse(brut);          // texte -> objet\n        // Valeurs par défaut pour les champs ajoutés après coup :\n        // une ancienne sauvegarde ne les contient pas\n        data.argent = typeof data.argent === \"number\" ? data.argent : 100;\n        data.sac = data.sac || {};\n        return data;\n    } catch (e) {\n        return null;                            // sauvegarde illisible\n    }\n}\n\nsauvegarder({ equipe: [\"Pikachu\"], etage: 3, argent: 250, date: Date.now() });"
+        },
+        {
+          "t": "Hasard : tirer et mélanger",
+          "d": "Les trois besoins classiques d'un jeu : un élément au hasard, un tableau mélangé équitablement, un entier entre deux bornes.",
+          "code": "// Un élément au hasard dans un tableau\nfunction auHasard(tab) {\n    return tab[Math.floor(Math.random() * tab.length)];\n}\n\n// Copie mélangée d'un tableau (algorithme de Fisher-Yates)\nfunction melanger(tab) {\n    const a = [...tab];                         // copie : l'original reste intact\n    for (let i = a.length - 1; i > 0; i--) {\n        const j = Math.floor(Math.random() * (i + 1));\n        [a[i], a[j]] = [a[j], a[i]];            // échange les cases i et j\n    }\n    return a;\n}\n\n// Entier entre min et max inclus\nconst entier = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;\n\n// À éviter : tab.sort(() => Math.random() - 0.5) ne mélange pas équitablement"
+        },
+        {
+          "t": "Borner une valeur (clamp)",
+          "d": "Empêche une valeur de sortir d'un intervalle : un volume entre 0 et 1, des points de vie entre 0 et le maximum.",
+          "code": "const borner = (valeur, min, max) => Math.max(min, Math.min(max, valeur));\n\nborner(150, 0, 100);   // 100\nborner(-5, 0, 100);    // 0\nborner(42, 0, 100);    // 42\n\naudio.volume = borner(volume, 0, 1);\npv = borner(pv - degats, 0, pvMax);"
+        },
+        {
+          "t": "Musique : attendre le premier clic",
+          "d": "Les navigateurs refusent de lancer du son tant que le visiteur n'a pas interagi avec la page. On démarre donc la musique au premier clic, une seule fois.",
+          "code": "const musique = new Audio(\"assets/audio/menu.mp3\");\nmusique.loop = true;\nmusique.volume = 0.4;\n\ndocument.addEventListener(\"click\", () => {\n    musique.play().catch(() => {});   // play() renvoie une promesse qui peut échouer\n}, { once: true });                   // l'écouteur se retire après le premier clic\n\n// Retenir le volume choisi d'une visite à l'autre\nfunction reglerVolume(v) {\n    musique.volume = v;\n    localStorage.setItem(\"volume\", String(v));\n}\nconst memorise = parseFloat(localStorage.getItem(\"volume\"));\nif (!isNaN(memorise)) musique.volume = memorise;"
+        },
+        {
+          "t": "Copier un texte dans le presse-papiers",
+          "d": "Un bouton « Copier » avec retour visuel. L'API ne fonctionne que sur un site en HTTPS ou en localhost.",
+          "code": "bouton.addEventListener(\"click\", async () => {\n    try {\n        await navigator.clipboard.writeText(\"texte à copier\");\n        bouton.textContent = \"Copié\";\n        setTimeout(() => { bouton.textContent = \"Copier\"; }, 1400);\n    } catch (e) {\n        console.error(\"Copie impossible\", e);   // hors HTTPS ou permission refusée\n    }\n});"
         }
       ]
     }

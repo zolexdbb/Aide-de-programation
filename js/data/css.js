@@ -11,11 +11,42 @@
 //   cards[].code    → extrait affiché tel quel, avec ses propres commentaires //
 // Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
 // l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
+// Le champ "guide" (texte affiché en tête de page) est décrit dans js/data/web.js.
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.css = {
   "id": "css",
   "label": "CSS",
   "color": "var(--css-color)",
+  "guide": {
+    "resume": "L'apparence de la page : couleurs, polices, espacements, mise en page, adaptation au mobile.",
+    "role": "Le CSS décide de l'allure de chaque élément HTML. Une règle se lit toujours de la même façon : un sélecteur (à qui ça s'applique), puis des propriétés (ce qu'on change). Le même fichier CSS s'applique à toutes les pages du site : changer une couleur à un seul endroit la change partout.\n\nCe n'est pas non plus un langage de programmation, mais il fait de plus en plus de choses seul : animations, thème sombre, mise en page qui s'adapte à la taille de l'écran.",
+    "pour": [
+      "Couleurs, polices, tailles, espacements",
+      "Mise en page avec Flexbox et Grid",
+      "Adapter le site au mobile (media queries)",
+      "Animations et transitions simples, thème clair / sombre"
+    ],
+    "pasPour": [
+      "Ajouter du contenu (il doit être dans le HTML)",
+      "Mémoriser un choix de l'utilisateur ou faire un calcul complexe (JavaScript)",
+      "Remplacer une structure HTML bancale"
+    ],
+    "fichiers": {
+      "texte": "Un seul fichier `css/style.css` suffit pour la plupart des sites. L'important est l'ordre à l'intérieur, toujours du plus général au plus précis :",
+      "arbre": "css/style.css\n├── 1. Variables        # :root { --couleur-fond: ...; } couleurs, polices, rayons\n├── 2. Base             # body, titres, liens : les réglages par défaut\n├── 3. Mise en page     # en-tête, navigation, grille principale, pied de page\n├── 4. Composants       # cartes, boutons, formulaires, fenêtre modale\n└── 5. Petits écrans    # @media (max-width: ...) : toujours à la fin",
+      "notes": [
+        "Un commentaire-titre par section (`/* ---------- Cartes ---------- */`) permet de s'y retrouver avec Ctrl + F.",
+        "Toutes les couleurs dans des variables : aucune valeur `#3ddc97` recopiée au milieu du fichier.",
+        "Des noms de classe qui disent ce que c'est (`.carte`, `.bouton-principal`), pas à quoi ça ressemble (`.bleu`, `.gros`)."
+      ]
+    },
+    "demarrer": [
+      "Créer `css/style.css` et le relier dans le `<head>` (fiche « Lier une feuille de style »).",
+      "Commencer par `* { box-sizing: border-box; }` et les variables de couleur.",
+      "Régler le `body` (police, couleur, fond), puis descendre élément par élément.",
+      "Tester en réduisant la fenêtre : F12, puis l'icône de téléphone, simule un écran de mobile."
+    ]
+  },
   "groups": [
     {
       "name": "Lier & sélectionner",
@@ -109,6 +140,46 @@ window.CHEATSHEET_DATA.css = {
           "t": "Centrer un élément : les bons réflexes",
           "d": "\"Centrer une div\" est une blague récurrente chez les développeurs tant ça a longtemps été pénible ; avec flexbox, c'est aujourd'hui devenu simple.",
           "code": "/* Centrer horizontalement UN bloc de largeur fixe */\n.bloc { width: 300px; margin: 0 auto; }\n\n/* Centrer horizontalement ET verticalement le contenu d'un conteneur */\n.conteneur {\n    display: flex;\n    justify-content: center; /* axe horizontal */\n    align-items: center;       /* axe vertical */\n    min-height: 100vh;           /* pour avoir de la hauteur à centrer dedans */\n}"
+        }
+      ]
+    },
+    {
+      "name": "Recettes de mise en page",
+      "cards": [
+        {
+          "t": "Thème clair / sombre avec des variables",
+          "d": "Les couleurs sont déclarées une fois en variables ; le thème sombre ne fait que redéfinir ces variables. Aucune autre règle du fichier n'a besoin de changer.",
+          "code": ":root {\n    --fond: #ffffff;\n    --texte: #1b1c1e;\n    --bordure: #e3e3df;\n    --accent: #15803d;\n}\n\n/* Le système est réglé en sombre : mêmes variables, autres valeurs */\n@media (prefers-color-scheme: dark) {\n    :root {\n        --fond: #0f1113;\n        --texte: #e7e7e4;\n        --bordure: #272b30;\n        --accent: #4ade80;\n    }\n}\n\n/* Le reste du fichier n'utilise QUE les variables */\nbody  { background: var(--fond); color: var(--texte); }\n.carte { border: 1px solid var(--bordure); }\na     { color: var(--accent); }"
+        },
+        {
+          "t": "Grille de cartes qui s'adapte seule",
+          "d": "Autant de colonnes que la largeur le permet, sans aucune media query : trois colonnes sur grand écran, une seule sur téléphone.",
+          "code": ".cartes {\n    display: grid;\n    /* autant de colonnes de 280px minimum que possible,\n       qui se partagent ensuite la place restante (1fr) */\n    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));\n    gap: 16px;\n}\n\n/* Pour imposer exactement 2 colonnes, puis 1 sur mobile : */\n.grille-deux { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }\n@media (max-width: 640px) {\n    .grille-deux { grid-template-columns: 1fr; }\n}"
+        },
+        {
+          "t": "Barre qui reste en haut (sticky)",
+          "d": "L'élément défile normalement, puis se colle en haut de l'écran quand il l'atteint. Contrairement à fixed, il garde sa place dans la page.",
+          "code": ".navigation {\n    position: sticky;\n    top: 0;              /* obligatoire : distance à laquelle il se colle */\n    z-index: 10;         /* passe au-dessus du contenu qui défile */\n    background: var(--fond);   /* sinon le contenu se voit à travers */\n}\n\n/* Ne fonctionne pas ? Un parent a sûrement overflow: hidden ou auto. */\n\n/* Évite que les titres visés par une ancre soient cachés sous la barre */\nhtml { scroll-padding-top: 72px; }"
+        },
+        {
+          "t": "Contour de focus visible",
+          "d": ":focus-visible affiche le contour pour la navigation au clavier (Tab), mais pas après un clic de souris. Ne jamais écrire outline: none sans le remplacer.",
+          "code": "/* Un seul style pour tous les éléments interactifs */\n:focus-visible {\n    outline: 2px solid var(--accent);\n    outline-offset: 2px;       /* petit espace entre l'élément et le contour */\n}\n\n/* À NE PAS FAIRE : les utilisateurs au clavier ne voient plus où ils sont */\nbutton:focus { outline: none; }"
+        },
+        {
+          "t": "Respecter « réduire les animations »",
+          "d": "Certaines personnes désactivent les animations dans leur système (mal des transports, troubles de l'attention). Ce bloc, placé en fin de fichier, coupe celles du site pour elles.",
+          "code": "@media (prefers-reduced-motion: reduce) {\n    *, *::before, *::after {\n        animation-duration: 0.01ms !important;\n        transition-duration: 0.01ms !important;\n        scroll-behavior: auto !important;\n    }\n}\n\n/* Défilement doux seulement pour ceux qui n'ont rien désactivé */\n@media (prefers-reduced-motion: no-preference) {\n    html { scroll-behavior: smooth; }\n}"
+        },
+        {
+          "t": "Fenêtre modale : fond et boîte centrée",
+          "d": "Un fond semi-transparent qui couvre tout l'écran, et une boîte centrée dedans. JavaScript ne fait qu'ajouter ou retirer la classe .ouverte (voir la fiche JavaScript correspondante).",
+          "code": ".modale-fond {\n    position: fixed;\n    inset: 0;                         /* top, right, bottom, left à 0 */\n    background: rgba(0, 0, 0, 0.6);\n    display: none;\n    place-items: center;              /* centre la boîte dans les deux sens */\n    padding: 16px;\n    z-index: 100;\n}\n.modale-fond.ouverte { display: grid; }\n\n.modale-boite {\n    width: min(480px, 100%);          /* 480px, ou moins sur petit écran */\n    max-height: 90vh;\n    overflow-y: auto;                 /* défile si le contenu est trop long */\n    background: var(--fond);\n    border-radius: 8px;\n    padding: 24px;\n}"
+        },
+        {
+          "t": "Zone cliquable assez grande",
+          "d": "Sur téléphone, un doigt a besoin d'environ 44 px. Un lien ou un bouton trop petit est difficile à toucher, même s'il paraît correct à la souris.",
+          "code": ".bouton, nav a {\n    min-height: 44px;\n    padding: 10px 16px;\n    display: inline-flex;\n    align-items: center;      /* centre le texte verticalement */\n    gap: 8px;                 /* espace entre icône et texte */\n    cursor: pointer;\n}\n\n/* Retour visuel au survol ET à l'appui */\n.bouton { transition: background 0.15s; }\n.bouton:hover  { background: var(--fond-survol); }\n.bouton:active { background: var(--fond-appui); }"
         }
       ]
     }

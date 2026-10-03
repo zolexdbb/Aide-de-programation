@@ -9,11 +9,42 @@
 //   cards[].code    → extrait affiché tel quel, avec ses propres commentaires //
 // Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
 // l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
+// Le champ "guide" (texte affiché en tête de page) est décrit dans js/data/web.js.
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.cpp = {
   "id": "cpp",
   "label": "C++",
   "color": "var(--cpp-color)",
+  "guide": {
+    "resume": "Le C avec des outils pour les gros programmes : classes, conteneurs prêts à l'emploi et gestion de la mémoire plus sûre.",
+    "role": "Le C++ garde la vitesse du C et y ajoute de quoi organiser de très gros programmes : les classes pour regrouper données et fonctions, la bibliothèque standard (`vector`, `string`, `map`) pour ne pas tout réécrire, et les pointeurs intelligents pour libérer la mémoire automatiquement.\n\nOn le retrouve dans les moteurs de jeux (Unreal Engine), les navigateurs, les logiciels de montage et de 3D : partout où il faut à la fois de la performance et beaucoup de code.",
+    "pour": [
+      "Jeux vidéo et moteurs 3D",
+      "Logiciels lourds : navigateurs, montage, CAO",
+      "Bibliothèques Arduino et code embarqué structuré",
+      "Programmes où chaque milliseconde compte"
+    ],
+    "pasPour": [
+      "Apprendre à programmer (trop de règles d'un coup)",
+      "Un prototype ou un script rapide",
+      "Un site web"
+    ],
+    "fichiers": {
+      "texte": "Une classe = deux fichiers : le `.hpp` décrit la classe, le `.cpp` contient le code de ses méthodes. On range les deux dans des dossiers séparés dès que le projet grossit :",
+      "arbre": "mon-projet/\n├── include/\n│   └── Joueur.hpp      # déclaration de la classe (attributs, prototypes)\n├── src/\n│   ├── Joueur.cpp      # code des méthodes de Joueur\n│   └── main.cpp        # point d'entrée\n├── CMakeLists.txt      # ou un Makefile : la recette de compilation\n└── build/              # fichiers générés : à ignorer dans Git",
+      "notes": [
+        "Un fichier par classe, portant le nom de la classe : on la retrouve sans chercher.",
+        "Jamais de `using namespace std;` dans un `.hpp` : il s'appliquerait à tous les fichiers qui l'incluent.",
+        "Pour un exercice d'un seul fichier, un simple `main.cpp` suffit."
+      ]
+    },
+    "demarrer": [
+      "Installer `g++` (fourni avec gcc : MinGW ou WSL sous Windows).",
+      "Partir de la fiche « Squelette d'un programme ».",
+      "Compiler avec `g++ main.cpp -o programme -Wall -std=c++17`, puis lancer `./programme`.",
+      "Préférer `std::vector` et `std::string` aux tableaux et chaînes du C : moins d'erreurs de mémoire."
+    ]
+  },
   "groups": [
     {
       "name": "Bases",
@@ -187,6 +218,16 @@ window.CHEATSHEET_DATA.cpp = {
           "t": "namespace",
           "d": "Un espace de noms permet d'éviter les conflits quand deux bibliothèques différentes utilisent le même nom de fonction.",
           "code": "namespace maths {\n    int carre(int x) { return x * x; }\n}\n\ncout << maths::carre(4) << endl; // accès explicite via ::\nusing namespace maths;             // ensuite, accès direct sans préfixe"
+        }
+      ]
+    },
+    {
+      "name": "Organiser un projet",
+      "cards": [
+        {
+          "t": "Une classe en deux fichiers (.hpp / .cpp)",
+          "d": "Le .hpp dit ce que la classe sait faire, le .cpp dit comment. Les autres fichiers n'incluent que le .hpp.",
+          "code": "// ----- Joueur.hpp -----\n#pragma once                 // évite la double inclusion\n#include <string>\n\nclass Joueur {\npublic:\n    Joueur(std::string nom, int pv);\n    void subirDegats(int degats);\n    int getPv() const;        // const : la méthode ne modifie pas l'objet\nprivate:\n    std::string nom;\n    int pv;\n};\n\n// ----- Joueur.cpp -----\n#include \"Joueur.hpp\"\n\nJoueur::Joueur(std::string nom, int pv) : nom(nom), pv(pv) {}\n\nvoid Joueur::subirDegats(int degats) {\n    pv -= degats;\n    if (pv < 0) pv = 0;\n}\n\nint Joueur::getPv() const { return pv; }\n\n// Compilation : g++ main.cpp Joueur.cpp -o programme -Wall"
         }
       ]
     }

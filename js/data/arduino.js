@@ -9,11 +9,42 @@
 //   cards[].code    → extrait affiché tel quel, avec ses propres commentaires //
 // Pour ajouter une fiche : copier un objet du tableau "cards" d'un groupe et
 // l'adapter. Pour ajouter une section : copier un objet du tableau "groups".
+// Le champ "guide" (texte affiché en tête de page) est décrit dans js/data/web.js.
 window.CHEATSHEET_DATA = window.CHEATSHEET_DATA || {};
 window.CHEATSHEET_DATA.arduino = {
   "id": "arduino",
   "label": "Arduino",
   "color": "var(--arduino-color)",
+  "guide": {
+    "resume": "Du C++ simplifié pour piloter une carte électronique : lire des capteurs, allumer des LED, faire tourner des moteurs.",
+    "role": "Arduino, c'est à la fois une carte électronique, un logiciel (l'IDE Arduino) et une façon simplifiée d'écrire du C++. Le programme, appelé « sketch », est envoyé sur la carte par USB et tourne ensuite en boucle, tout seul, tant qu'elle est alimentée.\n\nTout programme Arduino a la même forme : `setup()` s'exécute une fois au démarrage, puis `loop()` recommence sans fin. Le reste consiste à lire des broches (capteurs, boutons) et à en commander d'autres (LED, moteurs, écrans).",
+    "pour": [
+      "Prototypes électroniques et projets de cours",
+      "Robots, domotique, stations de mesure",
+      "Découvrir la programmation avec un résultat physique",
+      "Tester un capteur ou un composant rapidement"
+    ],
+    "pasPour": [
+      "Calculs lourds ou traitement d'image (trop peu de mémoire)",
+      "Un produit fini à fabriquer en série",
+      "Tout ce qui demande un système d'exploitation (voir Raspberry Pi)"
+    ],
+    "fichiers": {
+      "texte": "L'IDE impose une seule règle : le fichier `.ino` principal doit être dans un dossier qui porte exactement le même nom.",
+      "arbre": "Detecteur_dB/\n├── Detecteur_dB.ino    # sketch principal : setup() et loop()\n├── capteur.ino         # autre onglet (facultatif) : fonctions du capteur\n├── config.h            # numéros de broches et constantes\n└── README.md           # schéma de câblage, liste des composants",
+      "notes": [
+        "Les fichiers `.ino` d'un même dossier sont assemblés en un seul programme : pas besoin d'`#include` entre eux.",
+        "Les bibliothèques s'installent par le menu Croquis > Inclure une bibliothèque, pas en copiant des fichiers dans le projet.",
+        "Notez le câblage dans le README : dans six mois, vous ne saurez plus quelle broche allait où."
+      ]
+    },
+    "demarrer": [
+      "Installer l'IDE Arduino et brancher la carte en USB.",
+      "Choisir la carte et le port dans le menu Outils (voir la fiche « Téléverser un programme »).",
+      "Téléverser l'exemple Fichier > Exemples > Basics > Blink pour vérifier que tout fonctionne.",
+      "Ouvrir le moniteur série pour afficher des valeurs : c'est le seul moyen de voir ce que fait la carte."
+    ]
+  },
   "groups": [
     {
       "name": "Structure",
@@ -152,6 +183,21 @@ window.CHEATSHEET_DATA.arduino = {
           "t": "EEPROM",
           "d": "Une petite mémoire spéciale qui garde les valeurs écrites dedans même quand la carte est débranchée, contrairement aux variables normales qui s'effacent.",
           "code": "#include <EEPROM.h>\n\nEEPROM.write(0, 123);      // écrit l'octet 123 à l'adresse mémoire 0\nint val = EEPROM.read(0);   // relit la valeur stockée (0 à 255)"
+        }
+      ]
+    },
+    {
+      "name": "Organiser un projet",
+      "cards": [
+        {
+          "t": "Regrouper les réglages dans config.h",
+          "d": "Toutes les broches et constantes au même endroit : pour recâbler un composant, on ne modifie qu'une ligne au lieu de chercher dans tout le programme.",
+          "code": "// ----- config.h -----\n#pragma once\n\nconst int BROCHE_LED    = 13;\nconst int BROCHE_BOUTON = 2;\nconst int BROCHE_MICRO  = A0;\n\nconst unsigned long INTERVALLE_MESURE = 500;  // en millisecondes\nconst int SEUIL_BRUIT = 600;                  // valeur analogique (0 à 1023)\n\n// ----- MonProjet.ino -----\n#include \"config.h\"\n\nvoid setup() {\n    pinMode(BROCHE_LED, OUTPUT);\n    pinMode(BROCHE_BOUTON, INPUT_PULLUP);\n    Serial.begin(9600);\n}\n\nvoid loop() {\n    int niveau = analogRead(BROCHE_MICRO);\n    digitalWrite(BROCHE_LED, niveau > SEUIL_BRUIT ? HIGH : LOW);\n}"
+        },
+        {
+          "t": "Une fonction par tâche",
+          "d": "Un loop() de 200 lignes devient vite illisible. On le découpe en petites fonctions nommées : loop() se lit alors comme un sommaire.",
+          "code": "void loop() {\n    int niveau = lireNiveauSonore();\n    afficherNiveau(niveau);\n    if (niveau > SEUIL_BRUIT) declencherAlerte();\n}\n\nint lireNiveauSonore() {\n    return analogRead(BROCHE_MICRO);\n}\n\nvoid afficherNiveau(int niveau) {\n    Serial.print(\"Niveau : \");\n    Serial.println(niveau);\n}\n\nvoid declencherAlerte() {\n    digitalWrite(BROCHE_LED, HIGH);\n    tone(BROCHE_BUZZER, 1000, 200);   // 1000 Hz pendant 200 ms\n}\n\n// Ces fonctions peuvent aller dans un second onglet (capteur.ino)\n// du même dossier : l'IDE les assemble automatiquement."
         }
       ]
     }
