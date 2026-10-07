@@ -30,7 +30,7 @@ Aide-de-programation/
         ├── web.js      Page « Organiser son site »
         ├── c.js  cpp.js  arduino.js  python.js
         ├── html.js  css.js  js.js
-        └── git.js  markdown.js
+        └── git.js  markdown.js  json.js
 ```
 
 ## Fonctionnement

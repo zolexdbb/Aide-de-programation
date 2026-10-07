@@ -31,7 +31,7 @@ window.CHEATSHEET_DATA.cpp = {
     ],
     "fichiers": {
       "texte": "Une classe = deux fichiers : le `.hpp` décrit la classe, le `.cpp` contient le code de ses méthodes. On range les deux dans des dossiers séparés dès que le projet grossit :",
-      "arbre": "mon-projet/\n├── include/\n│   └── Joueur.hpp      # déclaration de la classe (attributs, prototypes)\n├── src/\n│   ├── Joueur.cpp      # code des méthodes de Joueur\n│   └── main.cpp        # point d'entrée\n├── CMakeLists.txt      # ou un Makefile : la recette de compilation\n└── build/              # fichiers générés : à ignorer dans Git",
+      "arbre": "mon-projet/\n├── include/\n│   └── Compte.hpp      # déclaration de la classe (attributs, prototypes)\n├── src/\n│   ├── Compte.cpp      # code des méthodes de Compte\n│   └── main.cpp        # point d'entrée\n├── CMakeLists.txt      # ou un Makefile : la recette de compilation\n└── build/              # fichiers générés : à ignorer dans Git",
       "notes": [
         "Un fichier par classe, portant le nom de la classe : on la retrouve sans chercher.",
         "Jamais de `using namespace std;` dans un `.hpp` : il s'appliquerait à tous les fichiers qui l'incluent.",
@@ -227,7 +227,7 @@ window.CHEATSHEET_DATA.cpp = {
         {
           "t": "Une classe en deux fichiers (.hpp / .cpp)",
           "d": "Le .hpp dit ce que la classe sait faire, le .cpp dit comment. Les autres fichiers n'incluent que le .hpp.",
-          "code": "// ----- Joueur.hpp -----\n#pragma once                 // évite la double inclusion\n#include <string>\n\nclass Joueur {\npublic:\n    Joueur(std::string nom, int pv);\n    void subirDegats(int degats);\n    int getPv() const;        // const : la méthode ne modifie pas l'objet\nprivate:\n    std::string nom;\n    int pv;\n};\n\n// ----- Joueur.cpp -----\n#include \"Joueur.hpp\"\n\nJoueur::Joueur(std::string nom, int pv) : nom(nom), pv(pv) {}\n\nvoid Joueur::subirDegats(int degats) {\n    pv -= degats;\n    if (pv < 0) pv = 0;\n}\n\nint Joueur::getPv() const { return pv; }\n\n// Compilation : g++ main.cpp Joueur.cpp -o programme -Wall"
+          "code": "// ----- Compte.hpp -----\n#pragma once                 // évite la double inclusion\n#include <string>\n\nclass Compte {\npublic:\n    Compte(std::string titulaire, int solde);\n    void retirer(int montant);\n    int getSolde() const;     // const : la méthode ne modifie pas l'objet\nprivate:\n    std::string titulaire;\n    int solde;\n};\n\n// ----- Compte.cpp -----\n#include \"Compte.hpp\"\n\nCompte::Compte(std::string titulaire, int solde) : titulaire(titulaire), solde(solde) {}\n\nvoid Compte::retirer(int montant) {\n    solde -= montant;\n    if (solde < 0) solde = 0;\n}\n\nint Compte::getSolde() const { return solde; }\n\n// Compilation : g++ main.cpp Compte.cpp -o programme -Wall"
         }
       ]
     }

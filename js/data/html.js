@@ -183,7 +183,7 @@ window.CHEATSHEET_DATA.html = {
         {
           "t": "Navigation : signaler la page active",
           "d": "aria-current indique aux lecteurs d'écran quel lien correspond à la page affichée, et sert en même temps de sélecteur CSS pour le mettre en évidence.",
-          "code": "<nav aria-label=\"Navigation principale\">\n    <a href=\"index.html\" aria-current=\"page\">Accueil</a>\n    <a href=\"regles.html\">Règles</a>\n    <a href=\"roles.html\">Rôles</a>\n</nav>\n\n<!-- Dans le CSS, pas besoin de classe \"active\" :\n     nav a[aria-current=\"page\"] { font-weight: 600; } -->"
+          "code": "<nav aria-label=\"Navigation principale\">\n    <a href=\"index.html\" aria-current=\"page\">Accueil</a>\n    <a href=\"services.html\">Services</a>\n    <a href=\"contact.html\">Contact</a>\n</nav>\n\n<!-- Dans le CSS, pas besoin de classe \"active\" :\n     nav a[aria-current=\"page\"] { font-weight: 600; } -->"
         },
         {
           "t": "Lien d'évitement (aller au contenu)",
@@ -193,7 +193,7 @@ window.CHEATSHEET_DATA.html = {
         {
           "t": "Liens externes & téléchargement",
           "d": "Ouvrir un lien dans un nouvel onglet sans risque, et proposer un fichier à télécharger plutôt qu'à afficher.",
-          "code": "<!-- Nouvel onglet : rel=\"noopener\" empêche la page ouverte\n     de prendre le contrôle de la vôtre -->\n<a href=\"https://www.hse.gov.uk\" target=\"_blank\" rel=\"noopener\">Site du HSE</a>\n\n<!-- Téléchargement : download force l'enregistrement\n     (et peut renommer le fichier) -->\n<a href=\"fichiers/modpack.zip\" download=\"modpack-v2.zip\">Télécharger le modpack</a>\n\n<!-- Adresse e-mail et téléphone -->\n<a href=\"mailto:contact@exemple.fr\">Écrire</a>\n<a href=\"tel:+33123456789\">Appeler</a>"
+          "code": "<!-- Nouvel onglet : rel=\"noopener\" empêche la page ouverte\n     de prendre le contrôle de la vôtre -->\n<a href=\"https://developer.mozilla.org\" target=\"_blank\" rel=\"noopener\">Documentation MDN</a>\n\n<!-- Téléchargement : download force l'enregistrement\n     (et peut renommer le fichier) -->\n<a href=\"fichiers/guide.pdf\" download=\"guide-v2.pdf\">Télécharger le guide</a>\n\n<!-- Adresse e-mail et téléphone -->\n<a href=\"mailto:contact@exemple.fr\">Écrire</a>\n<a href=\"tel:+33123456789\">Appeler</a>"
         },
         {
           "t": "Icône SVG plutôt qu'un emoji",

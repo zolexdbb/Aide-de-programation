@@ -19,7 +19,7 @@ window.CHEATSHEET_DATA.js = {
   "color": "var(--js-color)",
   "guide": {
     "resume": "Le comportement de la page : réagir aux clics, modifier le contenu, charger et enregistrer des données.",
-    "role": "JavaScript est le seul vrai langage de programmation des trois. Il s'exécute dans le navigateur du visiteur et peut tout modifier après le chargement : afficher une fenêtre, filtrer une liste, changer de page sans recharger, sauvegarder une partie.\n\nLa démarche est toujours la même : on récupère un élément de la page, on écoute un évènement (clic, frappe au clavier), et on modifie la page en réponse. Un site peut très bien fonctionner sans JavaScript ; on l'ajoute quand la page doit réagir.",
+    "role": "JavaScript est le seul vrai langage de programmation des trois. Il s'exécute dans le navigateur du visiteur et peut tout modifier après le chargement : afficher une fenêtre, filtrer une liste, changer de page sans recharger, enregistrer des préférences.\n\nLa démarche est toujours la même : on récupère un élément de la page, on écoute un évènement (clic, frappe au clavier), et on modifie la page en réponse. Un site peut très bien fonctionner sans JavaScript ; on l'ajoute quand la page doit réagir.",
     "pour": [
       "Réagir aux actions : clics, saisie, défilement",
       "Construire la page à partir de données (liste de rôles, de fiches, de produits)",
@@ -33,7 +33,7 @@ window.CHEATSHEET_DATA.js = {
     ],
     "fichiers": {
       "texte": "On sépare les données (les textes, les listes) de la logique (ce qui affiche et réagit). Pour changer un texte, on ne touche alors qu'au fichier de données.",
-      "arbre": "js/\n├── donnees.js      # uniquement des données : const roles = [ {...}, {...} ];\n└── app.js          # la logique : affichage, clics, navigation\n\n<!-- Dans index.html, juste avant </body>, dans cet ordre : -->\n<script src=\"js/donnees.js\"></script>\n<script src=\"js/app.js\"></script>",
+      "arbre": "js/\n├── donnees.js      # uniquement des données : const produits = [ {...}, {...} ];\n└── app.js          # la logique : affichage, clics, navigation\n\n<!-- Dans index.html, juste avant </body>, dans cet ordre : -->\n<script src=\"js/donnees.js\"></script>\n<script src=\"js/app.js\"></script>",
       "notes": [
         "L'ordre des balises `<script>` compte : un fichier ne peut utiliser que ce qui a été chargé avant lui.",
         "Placer les scripts en fin de `<body>` (ou ajouter `defer`) : sinon le code s'exécute avant que la page existe.",
@@ -159,17 +159,17 @@ window.CHEATSHEET_DATA.js = {
         {
           "t": "Générer du HTML à partir d'un tableau",
           "d": "Au lieu de recopier dix fois le même bloc HTML, on décrit les données dans un tableau et on laisse JavaScript fabriquer les blocs. Ajouter un élément au tableau suffit pour qu'il apparaisse.",
-          "code": "const risques = [\n    { id: \"stress\", titre: \"Stress au travail\" },\n    { id: \"bruit\",  titre: \"Bruit\" }\n];\n\n// map() transforme chaque objet en morceau de HTML, join(\"\") colle le tout\nconst html = risques\n    .map((r) => `<a class=\"carte\" href=\"#${r.id}\">${r.titre}</a>`)\n    .join(\"\");\n\ndocument.getElementById(\"cartes\").innerHTML = html;\n\n// innerHTML interprète les balises : parfait pour VOS données.\n// Pour du texte saisi par un visiteur, utiliser textContent."
+          "code": "const pages = [\n    { id: \"tarifs\",  titre: \"Nos tarifs\" },\n    { id: \"contact\", titre: \"Contact\" }\n];\n\n// map() transforme chaque objet en morceau de HTML, join(\"\") colle le tout\nconst html = pages\n    .map((p) => `<a class=\"carte\" href=\"#${p.id}\">${p.titre}</a>`)\n    .join(\"\");\n\ndocument.getElementById(\"cartes\").innerHTML = html;\n\n// innerHTML interprète les balises : parfait pour VOS données.\n// Pour du texte saisi par un visiteur, utiliser textContent."
         },
         {
           "t": "Changer de vue selon l'adresse (hashchange)",
-          "d": "Un site d'une seule page qui affiche des vues différentes selon l'ancre (#stress, #accueil). Chaque vue a sa propre adresse : on peut la partager, et le bouton Précédent du navigateur fonctionne.",
-          "code": "// index.html#stress  ->  location.hash vaut \"#stress\"\nfunction afficherVue() {\n    const id = location.hash.slice(1);             // enlève le \"#\"\n    const page = pages.find((p) => p.id === id);\n    if (page) afficherPage(page);\n    else afficherAccueil();                        // ancre vide ou inconnue\n}\n\nwindow.addEventListener(\"hashchange\", afficherVue); // à chaque changement d'ancre\nafficherVue();                                      // et une fois au chargement\n\n// Dans le HTML, de simples liens suffisent : <a href=\"#stress\">Stress</a>"
+          "d": "Un site d'une seule page qui affiche des vues différentes selon l'ancre (#contact, #accueil). Chaque vue a sa propre adresse : on peut la partager, et le bouton Précédent du navigateur fonctionne.",
+          "code": "// index.html#contact ->  location.hash vaut \"#contact\"\nfunction afficherVue() {\n    const id = location.hash.slice(1);             // enlève le \"#\"\n    const page = pages.find((p) => p.id === id);\n    if (page) afficherPage(page);\n    else afficherAccueil();                        // ancre vide ou inconnue\n}\n\nwindow.addEventListener(\"hashchange\", afficherVue); // à chaque changement d'ancre\nafficherVue();                                      // et une fois au chargement\n\n// Dans le HTML, de simples liens suffisent : <a href=\"#contact\">Contact</a>"
         },
         {
           "t": "Onglets avec des attributs data-",
           "d": "Chaque bouton porte le nom de sa section dans un attribut data-onglet. Un seul écouteur gère tous les boutons, sans onclick dans le HTML.",
-          "code": "// HTML : <nav id=\"onglets\">\n//            <button data-onglet=\"regles\">Règles</button>\n//            <button data-onglet=\"roles\">Rôles</button>\n//        </nav>\n//        <section id=\"regles\" class=\"onglet\">...</section>\n//        <section id=\"roles\" class=\"onglet\" hidden>...</section>\n\nfunction montrer(nom) {\n    document.querySelectorAll(\".onglet\").forEach((section) => {\n        section.hidden = section.id !== nom;       // cache tout sauf la section demandée\n    });\n    document.querySelectorAll(\"[data-onglet]\").forEach((bouton) => {\n        bouton.setAttribute(\"aria-selected\", bouton.dataset.onglet === nom);\n    });\n}\n\n// Un seul écouteur sur le parent (délégation d'évènement)\ndocument.getElementById(\"onglets\").addEventListener(\"click\", (e) => {\n    const bouton = e.target.closest(\"[data-onglet]\");\n    if (bouton) montrer(bouton.dataset.onglet);\n});"
+          "code": "// HTML : <nav id=\"onglets\">\n//            <button data-onglet=\"description\">Description</button>\n//            <button data-onglet=\"avis\">Avis</button>\n//        </nav>\n//        <section id=\"description\" class=\"onglet\">...</section>\n//        <section id=\"avis\" class=\"onglet\" hidden>...</section>\n\nfunction montrer(nom) {\n    document.querySelectorAll(\".onglet\").forEach((section) => {\n        section.hidden = section.id !== nom;       // cache tout sauf la section demandée\n    });\n    document.querySelectorAll(\"[data-onglet]\").forEach((bouton) => {\n        bouton.setAttribute(\"aria-selected\", bouton.dataset.onglet === nom);\n    });\n}\n\n// Un seul écouteur sur le parent (délégation d'évènement)\ndocument.getElementById(\"onglets\").addEventListener(\"click\", (e) => {\n    const bouton = e.target.closest(\"[data-onglet]\");\n    if (bouton) montrer(bouton.dataset.onglet);\n});"
         },
         {
           "t": "Fenêtre modale : ouvrir, fermer, touche Échap",
@@ -177,19 +177,19 @@ window.CHEATSHEET_DATA.js = {
           "code": "const fond = document.getElementById(\"modale-fond\");\n\nfunction ouvrirModale(titre, texte) {\n    document.getElementById(\"modale-titre\").textContent = titre;\n    document.getElementById(\"modale-texte\").textContent = texte;\n    fond.classList.add(\"ouverte\");\n    document.body.style.overflow = \"hidden\";   // bloque le défilement derrière\n}\n\nfunction fermerModale() {\n    fond.classList.remove(\"ouverte\");\n    document.body.style.overflow = \"\";\n}\n\ndocument.getElementById(\"modale-fermer\").addEventListener(\"click\", fermerModale);\nfond.addEventListener(\"click\", (e) => {\n    if (e.target === fond) fermerModale();     // clic sur le fond, pas sur la boîte\n});\ndocument.addEventListener(\"keydown\", (e) => {\n    if (e.key === \"Escape\") fermerModale();\n});"
         },
         {
-          "t": "Sauvegarder une partie (JSON + localStorage)",
+          "t": "Enregistrer des données (JSON + localStorage)",
           "d": "localStorage ne stocke que du texte : on convertit l'objet avec JSON.stringify pour l'enregistrer, et JSON.parse pour le relire. Le try/catch évite que le site plante si le stockage est plein ou bloqué.",
-          "code": "const CLE = \"monJeu_sauvegarde_1\";\n\nfunction sauvegarder(partie) {\n    try {\n        localStorage.setItem(CLE, JSON.stringify(partie));   // objet -> texte\n    } catch (e) {\n        console.error(\"Sauvegarde impossible\", e);\n    }\n}\n\nfunction charger() {\n    try {\n        const brut = localStorage.getItem(CLE);\n        if (!brut) return null;                 // aucune sauvegarde\n        const data = JSON.parse(brut);          // texte -> objet\n        // Valeurs par défaut pour les champs ajoutés après coup :\n        // une ancienne sauvegarde ne les contient pas\n        data.argent = typeof data.argent === \"number\" ? data.argent : 100;\n        data.sac = data.sac || {};\n        return data;\n    } catch (e) {\n        return null;                            // sauvegarde illisible\n    }\n}\n\nsauvegarder({ equipe: [\"Pikachu\"], etage: 3, argent: 250, date: Date.now() });"
+          "code": "const CLE = \"monSite_reglages_1\";\n\nfunction sauvegarder(reglages) {\n    try {\n        localStorage.setItem(CLE, JSON.stringify(reglages)); // objet -> texte\n    } catch (e) {\n        console.error(\"Sauvegarde impossible\", e);\n    }\n}\n\nfunction charger() {\n    try {\n        const brut = localStorage.getItem(CLE);\n        if (!brut) return null;                 // aucune sauvegarde\n        const data = JSON.parse(brut);          // texte -> objet\n        // Valeurs par défaut pour les champs ajoutés après coup :\n        // une ancienne sauvegarde ne les contient pas\n        data.volume = typeof data.volume === \"number\" ? data.volume : 50;\n        data.favoris = data.favoris || [];\n        return data;\n    } catch (e) {\n        return null;                            // sauvegarde illisible\n    }\n}\n\nsauvegarder({ theme: \"sombre\", volume: 80, favoris: [\"accueil\"], date: Date.now() });"
         },
         {
           "t": "Hasard : tirer et mélanger",
-          "d": "Les trois besoins classiques d'un jeu : un élément au hasard, un tableau mélangé équitablement, un entier entre deux bornes.",
+          "d": "Les trois besoins classiques : un élément au hasard, un tableau mélangé équitablement, un entier entre deux bornes.",
           "code": "// Un élément au hasard dans un tableau\nfunction auHasard(tab) {\n    return tab[Math.floor(Math.random() * tab.length)];\n}\n\n// Copie mélangée d'un tableau (algorithme de Fisher-Yates)\nfunction melanger(tab) {\n    const a = [...tab];                         // copie : l'original reste intact\n    for (let i = a.length - 1; i > 0; i--) {\n        const j = Math.floor(Math.random() * (i + 1));\n        [a[i], a[j]] = [a[j], a[i]];            // échange les cases i et j\n    }\n    return a;\n}\n\n// Entier entre min et max inclus\nconst entier = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;\n\n// À éviter : tab.sort(() => Math.random() - 0.5) ne mélange pas équitablement"
         },
         {
           "t": "Borner une valeur (clamp)",
-          "d": "Empêche une valeur de sortir d'un intervalle : un volume entre 0 et 1, des points de vie entre 0 et le maximum.",
-          "code": "const borner = (valeur, min, max) => Math.max(min, Math.min(max, valeur));\n\nborner(150, 0, 100);   // 100\nborner(-5, 0, 100);    // 0\nborner(42, 0, 100);    // 42\n\naudio.volume = borner(volume, 0, 1);\npv = borner(pv - degats, 0, pvMax);"
+          "d": "Empêche une valeur de sortir d'un intervalle : un volume entre 0 et 1, une quantité entre 0 et le stock disponible.",
+          "code": "const borner = (valeur, min, max) => Math.max(min, Math.min(max, valeur));\n\nborner(150, 0, 100);   // 100\nborner(-5, 0, 100);    // 0\nborner(42, 0, 100);    // 42\n\naudio.volume = borner(volume, 0, 1);\nquantite = borner(quantite + 1, 0, stock);"
         },
         {
           "t": "Musique : attendre le premier clic",

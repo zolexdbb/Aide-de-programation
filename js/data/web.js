@@ -52,17 +52,17 @@ window.CHEATSHEET_DATA.web = {
         {
           "t": "Petit site : l'arborescence de base",
           "d": "Suffisant pour un site vitrine, un devoir, un portfolio. Chaque type de fichier a son dossier, et index.html reste seul à la racine.",
-          "code": "risk-at-work/\n├── index.html          # squelette de la page\n├── css/\n│   └── style.css       # toute la mise en forme\n├── js/\n│   ├── donnees.js      # tous les textes du site\n│   └── app.js          # affichage et navigation\n├── img/\n│   └── logo.png\n└── README.md"
+          "code": "mon-site/\n├── index.html          # squelette de la page\n├── css/\n│   └── style.css       # toute la mise en forme\n├── js/\n│   ├── donnees.js      # tous les textes du site\n│   └── app.js          # affichage et navigation\n├── img/\n│   └── logo.png\n└── README.md"
         },
         {
           "t": "Gros projet : un dossier par domaine",
-          "d": "Quand le JavaScript dépasse quelques fichiers (un jeu, par exemple), on ne range plus par type mais par sujet : tout ce qui concerne le combat ensemble, tout ce qui concerne la sauvegarde ensemble.",
-          "code": "mon-jeu/\n├── index.html\n├── styles.css\n├── core/               # la base, utilisée partout\n│   ├── state.js        # l'état de la partie en cours\n│   └── rng.js          # fonctions de hasard\n├── combat/             # tout ce qui concerne les combats\n│   ├── damage-calc.js\n│   └── battle-ui.js\n├── ui/                 # écrans, menus, fenêtres\n├── save/\n│   └── save-system.js  # sauvegarde et chargement\n└── assets/\n    ├── audio/          # musiques, classées par écran\n    └── image/          # images, classées par usage\n\n# Un fichier = un sujet. S'il dépasse 500 lignes, c'est qu'il en contient deux."
+          "d": "Quand le JavaScript dépasse quelques fichiers (une boutique en ligne, par exemple), on ne range plus par type mais par sujet : tout ce qui concerne le catalogue ensemble, tout ce qui concerne le panier ensemble.",
+          "code": "ma-boutique/\n├── index.html\n├── styles.css\n├── core/               # la base, utilisée partout\n│   ├── state.js        # l'état de l'application\n│   └── utils.js        # petites fonctions utiles\n├── catalogue/          # tout ce qui concerne les produits\n│   ├── filtres.js\n│   └── fiche-produit.js\n├── panier/             # tout ce qui concerne le panier\n│   ├── calcul-total.js\n│   └── panier-ui.js\n├── ui/                 # écrans, menus, fenêtres\n└── assets/\n    ├── icones/         # pictogrammes de l'interface\n    └── images/         # photos, classées par usage\n\n# Un fichier = un sujet. S'il dépasse 500 lignes, c'est qu'il en contient deux."
         },
         {
           "t": "Bien nommer ses fichiers",
           "d": "Un serveur web fait la différence entre majuscules et minuscules, contrairement à Windows : un nom mal écrit fonctionne sur votre PC puis casse une fois en ligne.",
-          "code": "# BON\nindex.html\npage-contact.html\nimg/logo-lycee.png\njs/save-system.js\n\n# À ÉVITER\nPage Contact.html        # espace : devient %20 dans l'adresse\nPrésentation.html        # accent : problèmes d'encodage\nLogo.PNG                 # majuscules : \"logo.png\" ne sera pas trouvé en ligne\nscript(2)-final-v3.js    # utilisez Git pour les versions\n\n# Règles : minuscules, pas d'espace, pas d'accent, des tirets entre les mots,\n# et un nom qui dit ce que contient le fichier."
+          "code": "# BON\nindex.html\npage-contact.html\nimg/logo-accueil.png\njs/calcul-total.js\n\n# À ÉVITER\nPage Contact.html        # espace : devient %20 dans l'adresse\nPrésentation.html        # accent : problèmes d'encodage\nLogo.PNG                 # majuscules : \"logo.png\" ne sera pas trouvé en ligne\nscript(2)-final-v3.js    # utilisez Git pour les versions\n\n# Règles : minuscules, pas d'espace, pas d'accent, des tirets entre les mots,\n# et un nom qui dit ce que contient le fichier."
         },
         {
           "t": "Chemins relatifs",
@@ -82,12 +82,12 @@ window.CHEATSHEET_DATA.web = {
         {
           "t": "Plusieurs fichiers JS : l'ordre compte",
           "d": "Les scripts s'exécutent dans l'ordre où ils sont écrits. Un fichier ne peut utiliser que les variables et fonctions des fichiers chargés AVANT lui.",
-          "code": "<!-- 1. La base : fonctions et données utilisées partout -->\n<script src=\"core/rng.js\"></script>\n<script src=\"core/state.js\"></script>\n\n<!-- 2. Les données -->\n<script src=\"js/donnees.js\"></script>\n\n<!-- 3. Ce qui utilise la base et les données -->\n<script src=\"combat/damage-calc.js\"></script>\n<script src=\"ui/screens.js\"></script>\n\n<!-- 4. En dernier : le fichier qui démarre tout -->\n<script src=\"js/app.js\"></script>\n\n<!-- Erreur \"xxx is not defined\" dans la console ?\n     Le fichier qui définit xxx est chargé trop tard (ou son chemin est faux). -->"
+          "code": "<!-- 1. La base : fonctions et données utilisées partout -->\n<script src=\"core/utils.js\"></script>\n<script src=\"core/state.js\"></script>\n\n<!-- 2. Les données -->\n<script src=\"js/donnees.js\"></script>\n\n<!-- 3. Ce qui utilise la base et les données -->\n<script src=\"panier/calcul-total.js\"></script>\n<script src=\"ui/screens.js\"></script>\n\n<!-- 4. En dernier : le fichier qui démarre tout -->\n<script src=\"js/app.js\"></script>\n\n<!-- Erreur \"xxx is not defined\" dans la console ?\n     Le fichier qui définit xxx est chargé trop tard (ou son chemin est faux). -->"
         },
         {
           "t": "Séparer les données de l'affichage",
           "d": "Les textes dans un fichier, le code qui les affiche dans un autre. Pour ajouter un élément au site, on modifie uniquement les données : aucun risque de casser le code.",
-          "code": "// ----- js/donnees.js : uniquement des données -----\nconst roles = [\n    { nom: \"Luffy\", camp: \"pirate\", texte: \"Capitaine des Pirates.\" },\n    { nom: \"Garp\",  camp: \"marine\", texte: \"Amiral.\" }\n];\n\n// ----- js/app.js : uniquement de la logique -----\nfunction afficherRoles() {\n    document.getElementById(\"roles\").innerHTML = roles\n        .map((r) => `<article class=\"carte ${r.camp}\">\n                         <h3>${r.nom}</h3>\n                         <p>${r.texte}</p>\n                     </article>`)\n        .join(\"\");\n}\nafficherRoles();\n\n// Ajouter un rôle = ajouter une ligne dans donnees.js, rien d'autre."
+          "code": "// ----- js/donnees.js : uniquement des données -----\nconst produits = [\n    { nom: \"Stylo\", rayon: \"bureau\", texte: \"Encre bleue.\" },\n    { nom: \"Lampe\", rayon: \"maison\", texte: \"Ampoule fournie.\" }\n];\n\n// ----- js/app.js : uniquement de la logique -----\nfunction afficherProduits() {\n    document.getElementById(\"produits\").innerHTML = produits\n        .map((p) => `<article class=\"carte ${p.rayon}\">\n                         <h3>${p.nom}</h3>\n                         <p>${p.texte}</p>\n                     </article>`)\n        .join(\"\");\n}\nafficherProduits();\n\n// Ajouter un produit = ajouter une ligne dans donnees.js, rien d'autre."
         }
       ]
     },

@@ -11,7 +11,7 @@ const NAV_RAW = [
   { items: ['accueil'] },
   { title: 'Langages', items: ['c', 'cpp', 'arduino', 'python'] },
   { title: 'Site web', items: ['web', 'html', 'css', 'js'] },
-  { title: 'Outils', items: ['git', 'markdown'] }
+  { title: 'Outils', items: ['git', 'markdown', 'json'] }
 ];
 
 // Ne garde que les pages dont les données ont bien été chargées (au cas où
@@ -86,7 +86,7 @@ const COMMENT_PATTERNS = {
 const COMMENT_STYLES = {
   c: ['block', 'slash'], cpp: ['block', 'slash'], arduino: ['block', 'slash'],
   js: ['block', 'slash'], css: ['block'], html: ['html', 'block'],
-  python: ['hash'], git: ['hash'], markdown: ['html'],
+  python: ['hash'], git: ['hash'], markdown: ['html'], json: ['slash'],
   web: ['html', 'block', 'slash', 'hash']
 };
 

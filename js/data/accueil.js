@@ -82,6 +82,11 @@ window.CHEATSHEET_DATA.accueil = {
       "target": "markdown",
       "tag": "Du texte brut qui se met en forme tout seul",
       "text": "Quelques symboles (#, *, -) suffisent pour obtenir des titres, des listes et des tableaux. C'est le format des fichiers README sur GitHub, des messages Discord et de la plupart des documentations : dix minutes pour l'apprendre, des années à s'en servir."
+    },
+    {
+      "target": "json",
+      "tag": "Des accolades pour ranger des données",
+      "text": "Le format texte que tous les langages savent lire : des clés, des valeurs, des listes. C'est sous cette forme que les sites enregistrent leurs données et parlent aux bases de données — à condition de bien les ranger et de vérifier ce qu'on y écrit."
     }
   ]
 };
